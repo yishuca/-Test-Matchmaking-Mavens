@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Matchmaking Service - Find your perfect match with ease.">
+  <meta name="author" content="Yishuca Designs">
+  <title>Matchmaking Mavens</title>
+
+  <!-- W3.CSS -->
+  <link rel="stylesheet" href="../css/w3.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../img/android-chrome-192x192.png" type="image/x-icon">
+
+  <style>
+    .pointer {cursor: pointer;}
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: #d5d5d5;
+      color: #e0e0e0;
+      scroll-behavior: smooth;
+    }
+
+    /* Hero Section Styling */
+    .hero {
+      position: relative;
+      background: url('../img/1112\(2\).gif') no-repeat center center/cover;
+      height: 100vh;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+      z-index: 1;
+    }
+
+    .hero img {
+      font-size: 4em;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: slideUp 2.5s forwards;
+      animation-delay: 0.5s;
+      color: #e0e0e0;
+    }
+
+    .hero p {
+      font-size: 2em;
+      margin-bottom: 500px;
+      opacity: 0;
+      animation: slideUp 2s forwards;
+      animation-delay: 1.5s;
+      color: #ccc;
+      padding: 0px 20px;
+    }
+
+    .hero s {
+      font-size: 1em;
+      margin-bottom: 100;
+      opacity: 0;
+      animation: slideUp 2s forwards;
+      animation-delay: 3s;
+      color: #ccc;
+    }
+
+    /* Hero Animation */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      0% { transform: translateY(500px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Button Styling */
+    .button-primary {
+      background-color: #ff6969;
+      padding: 10px 25px;
+      font-size: 1.2em;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    }
+
+    /* Button Hover Effect */
+    .button-primary:hover {
+      transform: scale(1.1); /* Scale up on hover */
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Glowing effect */
+      filter: brightness(1.3); /* Brightness increase */
+    }
+
+    /* Hamburger Menu */
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1050;
+      display: none;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .hamburger div {
+      width: 35px;
+      height: 5px;
+      background-color: #656565;
+      margin: 6px 0;
+      transition: 0.4s;
+    }
+
+    /* Remove hover glow effect from Hamburger */
+    .hamburger:hover {
+      color: #1f3a61;
+      transform: scale(1.1);
+      box-shadow: none; /* Remove the glowing effect */
+    }
+
+    /* Hamburger Active State */
+    .hamburger.active div:nth-child(1) {
+      transform: translateY(11px) rotate(45deg);
+    }
+
+    .hamburger.active div:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active div:nth-child(3) {
+      transform: translateY(-11px) rotate(-45deg);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      background-color: #ff6969;
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+      color: white;
+    }
+
+    .sidebar a {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #f1f1f1;
+      display: block;
+      transition: 0.3s;
+      text-align: center;
+      border-radius: 5px;
+    }
+
+    /* Sidebar Link Hover Effect */
+    .sidebar a:hover {
+      color: #fff;
+      background-color: #ff8686;
+      box-shadow: 0 0 15px #a13434; /* Glowing */
+      transform: scale(1.05); /* Slight scale-up */
+    }
+
+    /* Service Cards */
+    .services {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 30px;
+      text-align: center;
+      z-index: 0;
+    }
+
+    .service-card {
+      background-color: #3e3e3e;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8); /* Glowing effect */
+      transition:  1s ease;      
+      max-width: 350px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(50px); /* Initially off-screen */
+    }
+
+    /* Service Card Hover Effect */
+    .service-card:hover {
+      transform: translateY(-10px); /* Smooth upward movement */
+      scale: 1.0; /* Slightly scale up */
+      box-shadow: 0 12px 30px #ffffff; /* Stronger shadow */
+      filter: brightness(1); /* Glowing effect */
+      background-color: 3e3e3e;
+      transition:  1s ease;
+      transform: scale(1.1); /* Scale up on hover */
+    }
+
+    /* Service Card Hover Transition */
+    .service-card {
+      transition: transform 0.6s ease, box-shadow 0.6s ease, filter 0.6s ease, background-color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .service-card h3 {
+      margin-bottom: 15px;
+      font-size: 1.8em;
+      color: #ff6969;
+      transition: color .5s ease;
+    }
+
+    /* Service Card Title Hover */
+    .service-card:hover h3 {
+      color: #ff6969;
+    }
+
+    .service-card p {
+      color: #ffffff;
+      transition: color 0.3s ease;
+    }
+
+    /* Service Card Text Hover */
+    .service-card:hover p {
+      color: #ff6969;
+    }
+
+    /* Scroll Reveal Effect */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Smooth Scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #000000;
+      padding: 16px;
+      text-align: center;
+      color: #fff;
+    }
+
+    footer p {
+      font-size: 1.1em;
+      transition: transform 0.3s ease;
+    }
+
+    /* Footer Text Hover Effect */
+    footer p:hover {
+      transform: scale(1.05); /* Slight scale-up */
+      color: #1f3a61;
+    }
+
+    /* Media Queries */
+    @media screen and (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+    }
+
+    @media screen and (min-width: 769px) {
+      .hamburger {
+        display: none;
+      }
+    }
+
+    .form-container {
+            background-color: #3e3e3e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            color: #fff;
+            max-width: 600px;
+            margin: 100px auto;
+            opacity: 0;
+            transform: translateY(-30px); /* Start position */
+            animation: fadeInSlide 0.5s ease forwards; /* New subtle animation */
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: #ff6969;
+        }
+
+        .form-container label, .form-container input {
+            display: block;
+            width: 100%;
+        }
+
+        .form-container input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #2c2c2c;
+            color: #fff;
+        }
+
+        .form-container button {
+            background-color: #ff6969;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .form-container button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .form-container p {
+            text-align: center;
+            color: #fff;
+            margin-top: 15px;
+        }
+
+        /* Hide both forms initially */
+        .form-container-signin, .form-container-create {
+            display: none;
+        }
+
+        /* Show specific form on button click */
+        .show-signin .form-container-signin {
+            display: block;
+        }
+
+        .show-create .form-container-create {
+            display: block;
+        }
+
+        /* Subtle fade-in and slide-down animation */
+        @keyframes fadeInSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+  </style>
+</head>
+<body>
+
+  <!-- Hamburger Menu -->
+  <div class="hamburger" onclick="toggleSidebar()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar w3-card-4"><br>
+    <a href="#" class="w3-animate-opacity" onclick="closeSidebar()">Home</a>
+    <a href="#letsgetstarted" onclick="closeSidebar()">Let's get started</a>
+    <a href="#packages" onclick="closeSidebar()">Packages</a>
+    <a href="#events" onclick="closeSidebar()">Events</a>
+    <a href="#contact" onclick="closeSidebar()">Contact</a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div>
+        <img class="w3-border-black w3-card-4 w3-topbar w3-rightbar w3-leftbar w3-bottombar w3-animate-top w3-mobile" style="width: 80%;" src="../img/logo.gif" alt="MatchmakingHavenLogo">
+      <p class="w3-margin-bottom w3-xxlarge">Join us today and meet your next match!</p>
+      <s><br><br>
+      <button class="button-primary" onclick="scrollToSection('services')">Explore our services</button>
+      </s>
+    </div>
+  </section>
+
+   <!-- Let's get started Section -->
+    <br id="letsgetstarted"><br>
+   <div id="letsgetstarted" class="w3-display-container w3-center">
+    <h3><b class="w3-text-purple w3-xxlarge w3-center reveal w3-padding-64" style="padding: 10px 10px;">Let's get started</b></h3>
+    <h4 class="w3-text-purple w3-xlarge w3-center reveal" style="padding: 10px 10px;">Choose a questionnaire below</h4>
+     </div>
+   <section class="services">
+    <div class="service-card reveal">
+      <h3><b>Pre-Matchmaking Questionnaire</b></h3>
+      <br><br>
+      <h4>This will help us briefly understand a little bit about you and what you're looking for.</h4>
+    <br><br><br>
+      <div>
+      <a href="https://forms.gle/948ovG8C2XkDLeMa7" style="color: #ff6969;" class="w3-button button-primary reveal w3-bar w3-purple w3-large w3-round">Take now</a>
+    </div><br>
+    </div>
+    <div class="service-card reveal">
+      <h3><b>Pre-In Person Interview Questionnaire</b></h3>
+      <h4>This provides us insights into your personality, relationship history, and what you seek in a partner, allowing us to match you with individuals who align with your values and expectations.</h4>
+      <a href="https://forms.gle/RjNHVEofDGDfPq3E8" style="color: #ff6969;" class="w3-button button-primary reveal w3-bar w3-purple w3-large w3-round">Take now</a>
+    </div>
+  </section>
+
+
+   <!-- Packages -->
+   <br id="packages">
+    <div class="w3-display-container w3-center">
+   <h3><b class="w3-text-teal w3-xxlarge w3-center reveal" style="padding: 10px 10px;">Find your perfect match</b></h3>
+   <h4 class="w3-text-teal w3-xlarge w3-center reveal" style="padding: 10px 10px;">Choose the Right Package for You</h4>
+    </div>
+   <section id="services" class="services">
+    <div class="service-card reveal">
+      <h3><b class="w3-text-teal">Basic Matchmaker</b></h3>
+      <h4 class="w3-text-teal">$100</h4>
+      <h4>Perfect for those looking to dip their toes into online matchmaking. This package allows you to browse matches, and send basic messages to potential partners. Get started with finding meaningful connections today.</h4>
+    <br><br>
+      <div>
+      <a href="#services" style="color: #0d0909;" class="button-primary w3-button reveal w3-bar w3-teal w3-large w3-round">Choose package</a>
+    </div><br>
+    </div>
+    <div class="service-card reveal">
+      <h3><b class="w3-text-teal">Premium Matchmaker</b></h3>
+      <h4 class="w3-text-teal">$200</h4>
+      <h4>Take your matchmaking experience to the next level. With the Premium package, you’ll receive personalized matchmaking recommendations, unlimited messaging, and advanced search filters. Plus, get access to exclusive events and features to find your ideal match faster.</h4>
+      <a href="#services" style="color: #ff6969;" class="button-primary w3-button reveal w3-bar w3-teal w3-large w3-round">Choose package</a>
+    </div>
+    <div class="service-card reveal">
+        <h3><b class="w3-text-teal">Elite Matchmaker</b></h3>
+        <h4 class="w3-text-teal">$300</h4>
+        <h4>Designed for serious seekers, this package includes everything in the Premium Matchmaker Package, plus a personalized match consultant. Enjoy profile optimization, priority visibility, and a curated list of top matches each week. Make your dating experience more efficient and successful.</h4>
+        <button id="events" href="#services" class="button-primary w3-button reveal w3-bar w3-teal w3-large w3-round">Choose package</button>
+      </div>
+  </section>
+  
+   <!-- Events Section -->
+   <br>
+   <div class="w3-display-container w3-center">
+    <h3><b class="w3-text-green w3-xxlarge w3-center reveal w3-padding-64">Events</b></h3>
+    <h4 class="w3-text-green w3-xlarge w3-center reveal" style="padding: 10px 10px;">Upcoming events to meet potential matches!</h4>
+     </div>
+   <section class="services">
+    <div class="service-card reveal">
+        <h3><b class="w3-text-green">Exclusive Events</b></h3>
+        <h4 id="events">Our Exclusive Events offer a unique opportunity to meet like-minded individuals in a fun, social atmosphere. From singles mixers to themed gatherings, these events allow you to connect face-to-face and form genuine relationships.</h4>
+        <br>
+        <a href="./events.html" class="button-primary w3-button reveal w3-bar w3-teal w3-large w3-round">Browse events</a>
+    </div>
+  </section>
+
+
+  <section style="position: relative; width: 100%;">
+    <!-- Image -->
+    <img class="w3-mobile" style="width: 100%;" src="../img/set.png" alt="MatchmakingHavenLogo">
+
+    <!-- Text Over Image -->
+    <div class="w3-mobile" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                color: white; font-size: 1.5rem; text-align: center; text-shadow: 1px 1px 3px rgba(0, 0, 0, 1.5);
+                padding: 5px 5px;">
+        <div class="reveal">
+        “Love can only be found through the act of loving.” <br> <i>— Paulo Coelho</i>
+        </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="w3-container w3-padding-64 w3-dark-grey" style="text-align:center;">
+    <div class="w3-xxlarge reveal" style="color:#ff6969;">
+        <b>Contact Us</b>
+    </div>
+    <div class="reveal w3-large">
+        <p>Have questions or need help? Reach out to us!</p>
+    </div>
+    <div class="reveal">
+        <p class="reveal w3-large">Brooklyn
+        <a class="reveal w3-hover-text-blue">(208) 960-5546</a><br>
+        </p>
+    </div>
+    <div class="reveal">
+      <p class="reveal w3-large">Tawnia
+      <a class="reveal w3-hover-text-blue">(208) 996-0490</a><br>
+      </p>
+  </div>
+  <div class="reveal">
+    <a class="reveal w3-hover-text-blue w3-large"href="thematchmakingmavens@gmail.com"><p>thematchmakingmavens@gmail.com</p></a>
+</div>
+  <div class="reveal">
+    <a href="https://www.facebook.com/people/Matchmaking-Maven/61568559238387/?mibextid=ZbWKwL" class="reveal">
+    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0 0 64 64"
+    style="fill:#ff6969;">
+    <path d="M32,6C17.642,6,6,17.642,6,32c0,13.035,9.603,23.799,22.113,25.679V38.89H21.68v-6.834h6.433v-4.548	c0-7.529,3.668-10.833,9.926-10.833c2.996,0,4.583,0.223,5.332,0.323v5.965h-4.268c-2.656,0-3.584,2.52-3.584,5.358v3.735h7.785	l-1.055,6.834h-6.73v18.843C48.209,56.013,58,45.163,58,32C58,17.642,46.359,6,32,6z"></path>
+    </svg>
+  </a>
+</div>
+  </section>
+
+  <section style="position: relative; width: 100%;">
+    <!-- Image -->
+    <img class="w3-mobile" style="width: 100%;" src="../img/pexels-photo-14826452.jpg" alt="MatchmakingHavenLogo">
+
+    <!-- Text Over Image -->
+    <div class="w3-mobile" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                color: white; font-size: 1.5rem; text-align: center; text-shadow: 1px 1px 3px rgba(0, 0, 0, 1.5);
+                padding: 5px 5px;">
+        <div class="reveal">
+        “Real love doesn’t meet you at your best. It meets you in your mess.” <i>— S. Park</i>
+        </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p class="pointer w3-hover-text-white w3-small" style="color: rgba(115, 115, 115, 0.8)">&copy; 2024 Powered by
+    <a href="https://www.google.com/search?q=Yishuca+Designs&stick=H4sIAAAAAAAA_-NgU1IxqDAzMU82NEk2MkqzNfirestoreIsrQyqEhLS7OwTDNPMrAwMjY1NEpexMofmVmcUZqcqOCSWpyZnlcMAI7WkV06AAAA&hl=en&mat=CcyCjVrczKUyElcBqiIDwuEnSkjtWn-T1yuTLkOZ0M76OHjKJvnvWiayBsnERJkKIrH5uH2yn5t0WsQl3sSypx1eetzXV58m4pBoi56C9U0JjRhXH8Z2uWJ_TesmeIFxW6A&authuser=1" class="pointer w3-hover-text-white w3-small" style="color: rgba(115, 115, 115, 0.8)">Yishuca Designs
+</a></p>
+  </footer>
+
+  <!-- JavaScript -->
+<script>
+    // Toggle Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      if (sidebar.style.width === '250px') {
+        sidebar.style.width = '0';
+        hamburger.classList.remove('active');
+      } else {
+        sidebar.style.width = '250px';
+        hamburger.classList.add('active');
+      }
+    }
+
+    // Close Sidebar when a link is clicked
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      sidebar.style.width = '0'; // Close the sidebar
+      hamburger.classList.remove('active'); // Reset hamburger icon
+    }
+
+        // Smooth Scroll to Section
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Scroll Reveal Effect
+    const revealElements = document.querySelectorAll('.reveal');
+
+    function revealOnScroll() {
+      revealElements.forEach(element => {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+          element.classList.add('visible');
+        }
+      });
+    }
+
+    // Trigger reveal effect on scroll
+    window.addEventListener('scroll', revealOnScroll);
+
+    // Initial trigger for elements in viewport
+    revealOnScroll();
+  
+
+  // Function to show the sign-in form
+  function showSignin() {
+      document.getElementById('signinForm').style.display = 'none';
+      document.getElementById('createAccountForm').style.display = 'block';
+  }
+
+  // Function to show the create Account form
+  function showCreateAccount() {
+      document.getElementById('createAccountForm').style.display = 'none';
+      document.getElementById('signinForm').style.display = 'block';
+  }
+
+  // By default show the Sign-In form
+  showSignin();
+</script>
+
+</body>
+</html>
