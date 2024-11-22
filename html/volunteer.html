@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Matchmaking Service - Find your perfect match with ease.">
+  <meta name="author" content="Yishuca Designs">
+  <title>Matchmaking Mavens</title>
+
+  <!-- W3.CSS -->
+  <link rel="stylesheet" href="../css/w3.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="./../img/android-chrome-192x192.png" type="image/x-icon">
+
+  <style>
+    .pointer {cursor: pointer;}
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: #d5d5d5;
+      color: #e0e0e0;
+      scroll-behavior: smooth;
+    }
+
+    /* Navbar */
+    .w3-navbar, .w3-footer {
+            background-color: #ff6969;
+            color: white;
+            z-index: 3;
+        }
+        .w3-button-dark, .w3-button-black:hover {
+            background-color: #444;
+            color: white;
+            border-radius: 5px;
+        }
+        .w3-button-dark:hover, .w3-button-black:hover {
+            background-color: #555;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+        }
+
+    /* Hero Section Styling */
+    .hero {
+      position: relative;
+      background: url('../img/hands.png') no-repeat center center/cover;
+      height: 40vh;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 4em;
+      margin-bottom: 0px;
+      opacity: 0;
+      animation: slideUp 5s forwards;
+      animation-delay: 0.0s;
+      color: #e0e0e0;
+    }
+
+    .hero p {
+      font-size: 2em;
+      margin-bottom: 0px;
+      opacity: 0;
+      animation: slideUp 1s forwards;
+      animation-delay: 0s;
+      color: #ccc;
+      padding: 0px 20px;
+    }
+
+    .hero s {
+      font-size: 1em;
+      margin-bottom: 100;
+      opacity: 0;
+      animation: slideUp 2s forwards;
+      animation-delay: 3s;
+      color: #ccc;
+    }
+
+    /* Hero Animation */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      0% { transform: translateY(500px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Button Styling */
+    .button-primary {
+      background-color: #ff6969;
+      padding: 10px 25px;
+      font-size: 1.2em;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    }
+
+    /* Button Hover Effect */
+    .button-primary:hover {
+      transform: scale(1.1); /* Scale up on hover */
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Glowing effect */
+      filter: brightness(1.3); /* Brightness increase */
+    }
+
+    /* Hamburger Menu */
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1050;
+      display: none;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .hamburger div {
+      width: 35px;
+      height: 5px;
+      background-color: #656565;
+      margin: 6px 0;
+      transition: 0.4s;
+    }
+
+    /* Remove hover glow effect from Hamburger */
+    .hamburger:hover {
+      color: #1f3a61;
+      transform: scale(1.1);
+      box-shadow: none; /* Remove the glowing effect */
+    }
+
+    /* Hamburger Active State */
+    .hamburger.active div:nth-child(1) {
+      transform: translateY(11px) rotate(45deg);
+    }
+
+    .hamburger.active div:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active div:nth-child(3) {
+      transform: translateY(-11px) rotate(-45deg);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      background-color: #ff6969;
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+      color: white;
+    }
+
+    .sidebar a {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #f1f1f1;
+      display: block;
+      transition: 0.3s;
+      text-align: center;
+      border-radius: 5px;
+    }
+
+    /* Sidebar Link Hover Effect */
+    .sidebar a:hover {
+      color: #fff;
+      background-color: #ff8686;
+      box-shadow: 0 0 15px #a13434; /* Glowing */
+      transform: scale(1.05); /* Slight scale-up */
+    }
+
+    /* Service Cards */
+    .services {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 30px;
+      text-align: center;
+      z-index: 0;
+    }
+
+    .service-card {
+      background-color: #3e3e3e;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8); /* Glowing effect */
+      transition:  1s ease;      
+      max-width: 350px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(50px); /* Initially off-screen */
+    }
+
+    /* Service Card Hover Effect */
+    .service-card:hover {
+      transform: translateY(-10px); /* Smooth upward movement */
+      scale: 1.0; /* Slightly scale up */
+      box-shadow: 0 12px 30px #ffffff; /* Stronger shadow */
+      filter: brightness(1); /* Glowing effect */
+      background-color: 3e3e3e;
+      transition:  1s ease;
+      transform: scale(1.1); /* Scale up on hover */
+    }
+
+    /* Service Card Hover Transition */
+    .service-card {
+      transition: transform 0.6s ease, box-shadow 0.6s ease, filter 0.6s ease, background-color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .service-card h3 {
+      margin-bottom: 15px;
+      font-size: 1.8em;
+      color: #ff6969;
+      transition: color .5s ease;
+    }
+
+    /* Service Card Title Hover */
+    .service-card:hover h3 {
+      color: #ff6969;
+    }
+
+    .service-card p {
+      color: #ffffff;
+      transition: color 0.3s ease;
+    }
+
+    /* Service Card Text Hover */
+    .service-card:hover p {
+      color: #ff6969;
+    }
+
+    /* Scroll Reveal Effect */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Smooth Scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #000000;
+      padding: 16px;
+      text-align: center;
+      color: #fff;
+    }
+
+    footer p {
+      font-size: 1.1em;
+      transition: transform 0.3s ease;
+    }
+
+    /* Footer Text Hover Effect */
+    footer p:hover {
+      transform: scale(1.05); /* Slight scale-up */
+      color: #1f3a61;
+    }
+
+    /* Media Queries */
+    @media screen and (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+    }
+
+    @media screen and (min-width: 769px) {
+      .hamburger {
+        display: none;
+      }
+    }
+
+    .form-container {
+            background-color: #3e3e3e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            color: #fff;
+            max-width: 600px;
+            margin: 100px auto;
+            opacity: 0;
+            transform: translateY(-30px); /* Start position */
+            animation: fadeInSlide 0.5s ease forwards; /* New subtle animation */
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: #ff6969;
+        }
+
+        .form-container label, .form-container input {
+            display: block;
+            width: 100%;
+        }
+
+        .form-container input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #2c2c2c;
+            color: #fff;
+        }
+
+        .form-container button {
+            background-color: #ff6969;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .form-container button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .form-container p {
+            text-align: center;
+            color: #fff;
+            margin-top: 15px;
+        }
+
+        /* Hide both forms initially */
+        .form-container-signin, .form-container-create {
+            display: none;
+        }
+
+        /* Show specific form on button click */
+        .show-signin .form-container-signin {
+            display: block;
+        }
+
+        .show-create .form-container-create {
+            display: block;
+        }
+
+        /* Subtle fade-in and slide-down animation */
+        @keyframes fadeInSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+  </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="w3-bar w3-top w3-xlarge w3-navbar w3-hide-small w3-card-4">
+        <a href="./index.html" class="w3-bar-item w3-button w3-mobile">Home</a>
+        <a href="./index.html#letsgetstarted" class="w3-bar-item w3-button w3-mobile">Let's get started</a>
+        <a href="./volunteer.html" class="w3-bar-item w3-button w3-mobile">Volunteer</a>
+        <a href="./index.html#contact" class="w3-bar-item w3-button w3-mobile">Contact</a>
+    </div>
+
+  <!-- Hamburger Menu -->
+  <div class="hamburger" onclick="toggleSidebar()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar w3-card-4"><br>
+    <a href="./index.html" class="w3-animate-opacity" onclick="closeSidebar()">Home</a>
+    <a href="./index.html#letsgetstarted" onclick="closeSidebar()">Let's get started</a>
+    <a href="./volunteer.html" onclick="closeSidebar()">Volunteer</a>
+    <a href="./index.html#contact" onclick="closeSidebar()">Contact</a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div>
+      <p class=" w3-text-green w3-mobile w3-jumbo" style="text-shadow: 0 0 6px #000000;"><b>Want to Volunteer?</b></p>
+      <p class="w3-margin-bottom w3-text-green w3-xxlarge"></p>
+    </div>
+  </section>
+
+   <!-- Volunteer Section -->
+   <div class="w3-display-container w3-center w3-card-4 w3-dark-grey"><br><br><br><br>
+    <p><b class="w3-text-green w3-xxlarge w3-center reveal w3-padding-64">Help Others Find Their Perfect Match!</b></p>
+    <p class="w3-text-white w3-xlarge w3-center reveal" style="padding: 10px 10px;">We’re excited to invite you to be a part of something special at MatchmakingMavens.com! <br> <br>As we continue to help people connect and find meaningful relationships,<br> we’re looking for passionate volunteers who are eager to make a difference in others’ lives.</p>
+    <br><br>
+        <p><b class="w3-text-green w3-xxlarge w3-center reveal w3-padding-64">What We’re Looking For:</b></p>
+        <p class="w3-text-white w3-xlarge w3-center reveal" style="padding: 10px 10px;">If you’re interested in joining us in this rewarding journey, <br>please take a moment to fill out our volunteer application. <br><br> We’ll carefully review all submissions and consider how your skills can best <br>support others on their journey to finding meaningful connections.</p>
+        <br><br>
+            <p><b class="w3-text-green w3-xxlarge w3-center reveal w3-padding-64">Important Notes:</b></p>
+            <p class="w3-text-white w3-xlarge w3-center reveal w3-medium" style="padding: 10px 10px;">• This is a volunteer position with no employment or wages involved. <br><br>
+                • We’ll review your application and select volunteers based on the <br> skills and qualities that align with our mission to help others find lasting relationships. <br><br><br><br>
+            </div>
+
+   <section class="services">
+    <div class="service-card reveal">
+        <h3><b class="w3-text-green">Volunteer Now!</b></h3><br>
+        <h4 id="events">Fill out the application form below to join our team of volunteers, and we’ll review your application to get started!</h4>
+        <br><br>
+        <a href="./volunteer.html" class="button-primary w3-button reveal w3-bar w3-green w3-large w3-round">Fill out application</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p class="w3-hover-text-white w3-small" style="color: rgba(115, 115, 115, 0.8)">&copy; 2024 Powered by
+    <a href="https://www.google.com/search?q=Yishuca+Designs&stick=H4sIAAAAAAAA_-NgU1IxqDAzMU82NEk2MkqzNfirestoreIsrQyqEhLS7OwTDNPMrAwMjY1NEpexMofmVmcUZqcqOCSWpyZnlcMAI7WkV06AAAA&hl=en&mat=CcyCjVrczKUyElcBqiIDwuEnSkjtWn-T1yuTLkOZ0M76OHjKJvnvWiayBsnERJkKIrH5uH2yn5t0WsQl3sSypx1eetzXV58m4pBoi56C9U0JjRhXH8Z2uWJ_TesmeIFxW6A&authuser=1" class="pointer w3-hover-text-white w3-small" style="color: rgba(115, 115, 115, 0.8)">Yishuca Designs
+</a></p>
+  </footer>
+
+  <!-- JavaScript -->
+<script>
+    // Toggle Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      if (sidebar.style.width === '250px') {
+        sidebar.style.width = '0';
+        hamburger.classList.remove('active');
+      } else {
+        sidebar.style.width = '250px';
+        hamburger.classList.add('active');
+      }
+    }
+
+    // Close Sidebar when a link is clicked
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      sidebar.style.width = '0'; // Close the sidebar
+      hamburger.classList.remove('active'); // Reset hamburger icon
+    }
+
+        // Smooth Scroll to Section
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Scroll Reveal Effect
+    const revealElements = document.querySelectorAll('.reveal');
+
+    function revealOnScroll() {
+      revealElements.forEach(element => {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+          element.classList.add('visible');
+        }
+      });
+    }
+
+    // Trigger reveal effect on scroll
+    window.addEventListener('scroll', revealOnScroll);
+
+    // Initial trigger for elements in viewport
+    revealOnScroll();
+  
+
+  // Function to show the sign-in form
+  function showSignin() {
+      document.getElementById('signinForm').style.display = 'none';
+      document.getElementById('createAccountForm').style.display = 'block';
+  }
+
+  // Function to show the create Account form
+  function showCreateAccount() {
+      document.getElementById('createAccountForm').style.display = 'none';
+      document.getElementById('signinForm').style.display = 'block';
+  }
+
+  // By default show the Sign-In form
+  showSignin();
+</script>
+
+</body>
+</html>
