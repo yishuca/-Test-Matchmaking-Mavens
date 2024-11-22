@@ -25,6 +25,22 @@
       scroll-behavior: smooth;
     }
 
+    /* Navbar */
+    .w3-navbar, .w3-footer {
+            background-color: #ff6969;
+            color: white;
+            z-index: 3;
+        }
+        .w3-button-dark, .w3-button-black:hover {
+            background-color: #444;
+            color: white;
+            border-radius: 5px;
+        }
+        .w3-button-dark:hover, .w3-button-black:hover {
+            background-color: #555;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+        }
+
     /* Hero Section Styling */
     .hero {
       position: relative;
@@ -59,6 +75,15 @@
     }
 
     .hero s {
+      font-size: 1em;
+      margin-bottom: 100;
+      opacity: 0;
+      animation: slideUp 2s forwards;
+      animation-delay: 3s;
+      color: #ccc;
+    }
+
+    .hero q {
       font-size: 1em;
       margin-bottom: 100;
       opacity: 0;
@@ -364,68 +389,16 @@
             }
         }
 
-        /*Following Heart*/
-        .hearts {
-            position: absolute;
-            width: 30px; /* Smaller heart */
-            height: 30px; /* Smaller heart */
-            transform-origin: center;
-            pointer-events: none; /* So it doesn't block interaction with other elements */
-            transition: transform 0.1s ease-out;
-            z-index: 9999; /* Ensures the heart is on top */
-        }
-
-        .hearts svg {
-            width: 100%;
-            height: 100%;
-            fill: #ff6969;
-        }
-
-        /* Falling Hearts */
-        .falling-hearts {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .heart {
-      position: absolute;
-      width: 30px;
-      height: 30;
-      transform: rotate(45deg);
-      animation: fall 200s infinite ease-in;
-    }
-
-    .heart svg {
-      width: 80%;
-      height: 80%;
-      fill: #ff6969; /* Heart color */
-    }
-
-    @keyframes fall {
-      from {
-        top: 20px;
-        opacity: 1;
-        transform: rotate(45deg); /* Start rotation */
-      }
-      to {
-        top: 100vh;
-        opacity: 0;
-        transform: rotate(360deg); /* 1 full rotation */
-      }
-    }
   </style>
 </head>
 <body>
-    <!-- Smaller Heart SVG -->
-    <div class="hearts">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-      </svg>
+    <!-- Navbar -->
+    <div class="w3-bar w3-top w3-xlarge w3-navbar w3-hide-small w3-card-4">
+      <a href="./index.html" class="w3-bar-item w3-button w3-mobile">Home</a>
+      <a href="./index.html#letsgetstarted" class="w3-bar-item w3-button w3-mobile">Let's get started
+      </a>
+      <a href="./volunteer.html" class="w3-bar-item w3-button w3-mobile">Volunteer</a>
+      <a href="./index.html#contact" class="w3-bar-item w3-button w3-mobile">Contact</a>
   </div>
 
   <!-- Hamburger Menu -->
@@ -437,11 +410,10 @@
 
   <!-- Sidebar -->
   <div id="sidebar" class="sidebar w3-card-4"><br>
-    <a href="#" class="w3-animate-opacity" onclick="closeSidebar()">Home</a>
-    <a href="#letsgetstarted" onclick="closeSidebar()">Let's get started</a>
-    <a href="#packages" onclick="closeSidebar()">Packages</a>
-    <a href="#events" onclick="closeSidebar()">Events</a>
-    <a href="#contact" onclick="closeSidebar()">Contact</a>
+    <a href="./index.html" class="w3-animate-opacity" onclick="closeSidebar()">Home</a>
+    <a href="./index.html#letsgetstarted" onclick="closeSidebar()">Let's get started</a>
+    <a href="./volunteer.html" onclick="closeSidebar()">Volunteer</a>
+    <a href="./index.html#contact" onclick="closeSidebar()">Contact</a>
   </div>
 
   <!-- Hero Section -->
@@ -455,11 +427,41 @@
     </div>
   </section>
 
+   <!-- Introduction --> <br><br>
+   <div id="letsgetstarted" class="w3-display-container w3-center" style="padding: 15px 15px;">
+    <h3><b class="w3-text-purple w3-xxlarge w3-center reveal w3-padding-64">Matchmaking:</b></h3>
+
+    <h3><b class="w3-text-purple w3-xlarge w3-center reveal w3-padding-64">An Investment in Your Future</b></h3>
+
+    <p class="w3-text-purple w3-xlarge w3-center reveal">
+      In a world that's increasingly fast-paced and digitally driven, <br class="reveal">finding love can feel like a daunting task.
+      
+      <br><br><p class="reveal w3-text-purple w3-xlarge">That's where we come in.</p>
+      <br><p class="reveal w3-text-purple w3-xlarge">As seasoned matchmakers, we've dedicated our lives to the art and science of pairing compatible souls.</p>
+      <br><br><p class="reveal w3-text-purple w3-xlarge">We understand that finding a meaningful connection isn't just about chance; it's an investment in your future happiness.</p>
+      <br><br><p class="reveal w3-text-purple w3-xlarge">Our matchmaking services go far beyond traditional dating apps. We take the time to truly understand you, your values, your aspirations, and your unique love language.</p>
+      <br><br><p class="reveal w3-text-purple w3-xlarge">We delve deep into your personality, lifestyle, and relationship history to identify your ideal match.</p>
+      <br><br><p class="reveal w3-text-purple w3-xlarge">Our process involves a meticulous combination of:</p>
+      <br><br>
+      <p class="reveal w3-text-purple w3-xlarge"><b>* Personalized Consultations:</b><br> We conduct in-depth interviews to gain a comprehensive understanding of your desires and expectations.</p>
+      <br><br>
+      <p class="reveal w3-text-purple w3-xlarge"><b>* Extensive Screening:</b><br> We meticulously screen potential matches to ensure they align with your criteria and values.</p>
+      <br><br>
+      <p class="reveal w3-text-purple w3-xlarge"><b>* Intriguing Introductions:</b><br> We curate captivating introductions that spark interest and foster meaningful connections.</p>
+      <br><br>
+      <p class="reveal w3-text-purple w3-xlarge"><b>* Ongoing Support:</b><br> We provide ongoing support and guidance throughout your dating journey, offering advice and encouragement every step of the way.</p>
+      <br><br><p class="reveal w3-text-purple w3-xlarge">By investing in our matchmaking services, you're investing in your future happiness. We'll help you navigate the complexities of modern dating, saving you time, energy, and heartache.</p>
+      <br><br><p class="reveal w3-text-purple w3-xlarge">With our expertise and personalized approach, you'll have a higher chance of finding a lasting and fulfilling relationship.</p>
+      <br><br>
+      <p class="reveal w3-text-purple w3-xlarge">Are you ready to take the next step toward love? Let us be your matchmakers.</p>
+    </p>
+   </div>
+
    <!-- Let's get started Section -->
     <br id="letsgetstarted"><br>
    <div id="letsgetstarted" class="w3-display-container w3-center">
-    <h3><b class="w3-text-purple w3-xxlarge w3-center reveal w3-padding-64" style="padding: 10px 10px;">Let's get started</b></h3>
-    <h4 class="w3-text-purple w3-xlarge w3-center reveal" style="padding: 10px 10px;">Please fill out these questionnaires</h4>
+    <p><b class="w3-text-purple w3-xxlarge w3-center reveal w3-padding-64" style="padding: 10px 10px;">Let's get started</b></p>
+    <p class="w3-text-purple w3-xlarge w3-center reveal" style="padding: 10px 10px;">Please start with the first questionnaire below</p>
      </div>
    <section class="services">
     <div class="service-card reveal">
@@ -477,6 +479,22 @@
       <a href="https://forms.gle/RjNHVEofDGDfPq3E8" style="color: #ff6969;" class="w3-button button-primary reveal w3-bar w3-purple w3-large w3-round">Take now</a>
     </div>
   </section>
+
+
+   <!-- Volunteer Section -->
+   <br>
+   <div class="w3-display-container w3-center">
+    <p><b class="w3-text-green w3-xxlarge w3-center reveal w3-padding-64">Want to help?</b></p>
+    <p class="w3-text-green w3-xlarge w3-center reveal" style="padding: 10px 10px;">Join Our Volunteer Team at MatchmakingMavens.com!</p>
+     </div>
+   <section class="services">
+    <div class="service-card reveal">
+        <h3><b class="w3-text-green">Volunteer</b></h3>
+        <h4 id="events">Your support can directly impact someone's journey to finding their perfect match. <br> <br>Fill out our volunteer application today and be part of something special!</h4>
+        <br>
+        <a href="./volunteer.html" class="button-primary w3-button reveal w3-bar w3-green w3-large w3-round">See how you can help</a>
+    </div>
+  </section><br>
 
   <section style="position: relative; width: 100%;">
     <!-- Image -->
@@ -511,7 +529,7 @@
       </p>
   </div>
   <div class="reveal">
-    <a class="reveal w3-hover-text-blue w3-large"href="thematchmakingmavens@gmail.com"><p>thematchmakingmavens@gmail.com</p></a>
+    <a class="reveal w3-hover-text-blue w3-medium"href="mailto:thematchmakingmavens@gmail.com"><p>thematchmakingmavens@gmail.com</p></a>
 </div>
   <div class="reveal">
     <a href="https://www.facebook.com/people/Matchmaking-Maven/61568559238387/?mibextid=ZbWKwL" class="reveal">
@@ -543,8 +561,6 @@
     <a href="https://www.google.com/search?q=Yishuca+Designs&stick=H4sIAAAAAAAA_-NgU1IxqDAzMU82NEk2MkqzNfirestoreIsrQyqEhLS7OwTDNPMrAwMjY1NEpexMofmVmcUZqcqOCSWpyZnlcMAI7WkV06AAAA&hl=en&mat=CcyCjVrczKUyElcBqiIDwuEnSkjtWn-T1yuTLkOZ0M76OHjKJvnvWiayBsnERJkKIrH5uH2yn5t0WsQl3sSypx1eetzXV58m4pBoi56C9U0JjRhXH8Z2uWJ_TesmeIFxW6A&authuser=1" class="pointer w3-hover-text-white w3-small" style="color: rgba(115, 115, 115, 0.8)">Yishuca Designs
 </a></p>
   </footer>
-
-  <div class="falling-hearts"></div>
 
   <!-- JavaScript -->
 <script>
@@ -610,98 +626,5 @@
   showSignin();
 </script>
 
-<script>
-  // Get the heart element
-  const heart = document.querySelector('.hearts');
-
-  // Initialize offset values
-  let offsetX = 0;
-  let offsetY = 0;
-
-  // Track the mouse coordinates
-  let mouseX = 0;
-  let mouseY = 0;
-
-  // Define the trailing offset distance (20px right and 20px down)
-  const offsetDistanceX = 20; // 20px to the right of the mouse
-  const offsetDistanceY = 20; // 20px below the mouse
-
-  // Listen for the mousemove event to track the mouse
-  document.body.addEventListener('mousemove', (event) => {
-      mouseX = event.clientX;
-      mouseY = event.clientY;
-  });
-
-  // Update the heart's position
-  function moveHeart() {
-      // Adjust the mouseY to account for the scroll position
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-
-      // Adjust the target position (mouse position + offset)
-      const targetX = mouseX + offsetDistanceX;
-      const targetY = mouseY + offsetDistanceY + scrollY; // Add scrollY to Y-coordinate
-
-      const speed = 0.1; // Controls how fast the heart follows the cursor (lower value = slower)
-      const catchUpSpeed = 0.2; // The speed when catching up to the cursor (higher value = faster)
-
-      // Calculate the offset to make the heart follow behind the cursor
-      offsetX += (targetX - offsetX - heart.offsetWidth / 2) * speed;
-      offsetY += (targetY - offsetY - heart.offsetHeight / 2) * speed;
-
-      // Increase the speed when the heart is close to the mouse to catch up
-      if (Math.abs(targetX - offsetX) < 10 && Math.abs(targetY - offsetY) < 10) {
-          offsetX += (targetX - offsetX - heart.offsetWidth / 2) * catchUpSpeed;
-          offsetY += (targetY - offsetY - heart.offsetHeight / 2) * catchUpSpeed;
-      }
-
-      // Set the new position of the heart
-      heart.style.left = offsetX + 'px';
-      heart.style.top = offsetY + 'px';
-
-      // Call the moveHeart function repeatedly
-      requestAnimationFrame(moveHeart);
-  }
-
-  // Start the animation
-  moveHeart();
-
-</script>
-
-<script>
-  const heartContainer = document.querySelector('.falling-hearts');
-
-  // Array of different heart SVGs to randomly pick from
-  const heartTypes = [
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-    </svg>`,
-  ];
-
-  function createHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-
-    // Set a random position along the top (between 0% to 100% of the viewport width)
-    heart.style.left = `${Math.random() * 100}vw`;
-
-    // Set a random fall speed (animation duration between 10 and 20 seconds)
-    heart.style.animationDuration = `${Math.random() * 10 + 10}s`;
-
-    // Pick a random heart SVG from the heartTypes array
-    const heartSvg = heartTypes[Math.floor(Math.random() * heartTypes.length)];
-
-    heart.innerHTML = heartSvg;
-    
-    heartContainer.appendChild(heart);
-
-    // Remove the heart after it finishes falling (20s should match the fall animation duration)
-    setTimeout(() => {
-      heart.remove();
-    }, 20000);
-  }
-
-  // Create hearts continuously (adjust the interval for heart density)
-  setInterval(createHeart, 3000); 
-</script>
 </body>
 </html>
