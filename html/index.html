@@ -390,6 +390,36 @@
             }
         }
 
+        .spark {
+      position: absolute;
+      width: 2px;  /* Smaller width */
+      height: 2px; /* Smaller height */
+      background-color: rgba(255, 242, 141, 0.8); /* Sparkle color */
+      border-radius: 50%;
+      animation: sparkleFall 20s linear infinite; /* Slower falling duration */
+      z-index: 2;
+    }
+
+    @keyframes sparkleFall {
+      0% {
+        transform: translateY(0) scale(1); /* Start at the top of the viewport */
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) scale(0.5); /* End at the bottom of the viewport */
+        opacity: 0;
+      }
+    }
+
+    /* Create a container for the falling sparks */
+    .spark-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -418,6 +448,7 @@
   </div>
 
   <!-- Hero Section -->
+  <div class="spark-container"></div>
   <section class="hero">
     <div>
         <img class="w3-border-black w3-card-4 w3-topbar w3-rightbar w3-leftbar w3-bottombar w3-animate-top w3-mobile" style="width: 80%;" src="../img/logo.gif" alt="MatchmakingHavenLogo">
@@ -623,6 +654,35 @@
   // By default show the Sign-In form
   showSignin();
 </script>
+
+<script>
+    // Function to create and animate sparks
+    function createSparks() {
+      const container = document.querySelector('.spark-container');
+      const maxSparks = 200; // Max sparks on screen at any time
+      const spawnInterval = 100; // Interval to spawn new sparks (milliseconds)
+
+      // Function to create a new spark element
+      function spawnSpark() {
+        if (container.children.length < maxSparks) {
+          const spark = document.createElement('div');
+          spark.classList.add('spark');
+        
+          // Random X position for each spark
+          spark.style.left = `${Math.random() * 100}vw`; 
+          // Remove animation delay to make them start falling right away
+          spark.style.animationDelay = '0s'; 
+          container.appendChild(spark);
+        }
+      }
+
+      // Spawn sparks continuously at the given interval
+      setInterval(spawnSpark, spawnInterval);
+    }
+
+    // Call the function to create the sparks
+    createSparks();
+  </script>
 
 </body>
 </html>
