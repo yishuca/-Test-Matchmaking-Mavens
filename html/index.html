@@ -52,6 +52,7 @@
       align-items: center;
       text-align: center;
       animation: fadeIn 1s ease-in-out;
+      z-index: 1;
     }
 
     .hero img {
@@ -658,27 +659,21 @@
     // Function to create and animate sparks
     function createSparks() {
       const container = document.querySelector('.spark-container');
-      const maxSparks = 20; // Limit the maximum number of sparks on the screen at once
-      const spawnInterval = 150; // Interval to spawn new sparks (milliseconds)
+      const maxSparks = 200; // Max sparks on screen at any time
+      const spawnInterval = 100; // Interval to spawn new sparks (milliseconds)
 
       // Function to create a new spark element
       function spawnSpark() {
-        const spark = document.createElement('div');
-        spark.classList.add('spark');
+        if (container.children.length < maxSparks) {
+          const spark = document.createElement('div');
+          spark.classList.add('spark');
         
-        // Random X position for each spark
-        spark.style.left = `${Math.random() * 100}vw`; 
-        
-        // Randomize the falling speed of each spark
-        const randomDelay = Math.random() * 2; // Random delay for each spark
-        spark.style.animationDelay = `${randomDelay}s`; 
-
-        container.appendChild(spark);
-        
-        // Remove the spark after it falls off the screen to maintain a consistent number
-        setTimeout(() => {
-          container.removeChild(spark);
-        }, 10000);  // This matches the animation duration of 10s, removing the spark after it falls off
+          // Random X position for each spark
+          spark.style.left = `${Math.random() * 100}vw`; 
+          // Remove animation delay to make them start falling right away
+          spark.style.animationDelay = '0s'; 
+          container.appendChild(spark);
+        }
       }
 
       // Spawn sparks continuously at the given interval
@@ -688,5 +683,6 @@
     // Call the function to create the sparks
     createSparks();
   </script>
+
 </body>
 </html>
