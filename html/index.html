@@ -390,6 +390,28 @@
             }
         }
 
+        /* Create the sparkling effects using absolute positioning */
+        .spark {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: moveAway 1s forwards;
+        }
+
+        /* Animation for sparks moving away from the point */
+        @keyframes moveAway {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--move-x), var(--move-y));
+                opacity: 0;
+            }
+        }
   </style>
 </head>
 <body>
@@ -623,6 +645,53 @@
   // By default show the Sign-In form
   showSignin();
 </script>
+
+    <!-- JS script to generate the spark effects -->
+    <script>
+      function generateSparks(x, y) {
+          const container = document.body;
+
+          // Create a spark element
+          const spark = document.createElement('div');
+          spark.classList.add('spark');
+          
+          // Randomize the distance the spark moves away from the cursor
+          const moveX = (Math.random() - 0.5) * 100; // Move in x direction (-50px to 50px)
+          const moveY = (Math.random() - 0.5) * 100; // Move in y direction (-50px to 50px)
+
+          // Apply custom properties for movement distance
+          spark.style.setProperty('--move-x', `${moveX}px`);
+          spark.style.setProperty('--move-y', `${moveY}px`);
+
+          // Set the initial position of the spark at the cursor or touch position
+          spark.style.left = `${x}px`;
+          spark.style.top = `${y}px`;
+
+          // Append spark to the body
+          container.appendChild(spark);
+
+          // Remove the spark after the animation is complete
+          setTimeout(() => {
+              spark.remove();
+          }, 1000); // The duration of the animation (1s)
+      }
+
+      // Mousemove event for desktop devices
+      window.addEventListener('mousemove', (e) => {
+          generateSparks(e.pageX, e.pageY);
+      });
+
+      // Touchmove event for mobile devices
+      window.addEventListener('touchmove', (e) => {
+          // Prevent the page from scrolling while interacting
+          e.preventDefault();
+
+          // For each touch point, create sparks
+          for (let i = 0; i < e.touches.length; i++) {
+              generateSparks(e.touches[i].pageX, e.touches[i].pageY);
+          }
+      }, { passive: false });
+  </script>
 
 </body>
 </html>
