@@ -10,13 +10,15 @@
   <!-- W3.CSS -->
   <link rel="stylesheet" href="../css/w3.css">
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Reenie+Beanie&family=Shadows+Into+Light&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="icon" href="./../img/android-chrome-192x192.png" type="image/x-icon">
 
   <style>
     .pointer {cursor: pointer;}
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Sour Gummy';
       margin: 0;
       padding: 0;
       overflow-x: hidden;
@@ -379,6 +381,17 @@
             }
         }
 
+        .glow { /* Changed class name to spark */
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: rgba(255, 254, 179, 0.8); /* Light spark particles */
+            pointer-events: none; /* Prevent sparks from interfering with cursor events */
+            opacity: 1;
+            transition: transform 0.4s ease-out, opacity 1s ease-out; /* Smooth fading effect */
+            z-index: 9999; /* Ensure sparks are in the foreground */
+        }
   </style>
 </head>
 <body>
@@ -428,10 +441,10 @@
 
    <section class="services">
     <div class="service-card reveal">
-        <h3><b class="w3-text-purple">Volunteer Now!</b></h3><br>
-        <h4 id="events">Fill out the application form below to join our team of volunteers, and we’ll review your application to get started!</h4>
+        <p><b class="w3-text-purple w3-xxlarge">Volunteer Now!</b></p><br>
+        <p id="events" class="w3-xlarge">Fill out the application form below to join our team of volunteers, and we’ll review your application to get started!</p>
         <br><br>
-        <a href="./volunteer.html" class="button-primary w3-button reveal w3-bar w3-purple w3-large w3-round">Fill out application</a>
+        <a href="https://forms.gle/85wbukbeabgUyerX7" class="button-primary w3-button reveal w3-bar w3-purple w3-large w3-round">Fill out application</a>
     </div>
   </section>
 
@@ -506,5 +519,104 @@
   showSignin();
 </script>
 
+<script>
+  let cursorX = 0;
+  let cursorY = 0;
+  let lastX = 0;
+  let lastY = 0;
+  let lastTime = Date.now();
+  
+  // Function to handle mouse movement
+  function onMouseMove(event) {
+      if (event.type === 'mousemove') {
+          cursorX = event.clientX;
+          cursorY = event.clientY;
+      } else if (event.type === 'touchmove') {
+          // Get the touch position for mobile devices
+          cursorX = event.touches[0].clientX;
+          cursorY = event.touches[0].clientY;
+      }
+
+      // Calculate speed of cursor/touch movement
+      let currentTime = Date.now();
+      let speed = Math.sqrt((cursorX - lastX) ** 2 + (cursorY - lastY) ** 2) / (currentTime - lastTime) * 1000;
+      
+      // Create fewer particles for smaller movements
+      if (speed > 30) {  // Lowered threshold for fewer particles
+          createGlows(cursorX, cursorY, speed);  // Speed will influence particle behavior
+      }
+      
+      lastX = cursorX;
+      lastY = cursorY;
+      lastTime = currentTime;
+  }
+
+  // Listen for mousemove (desktop) and touchmove (mobile)
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('touchmove', onMouseMove);
+
+  // Create a burst of small white glowing particles at the cursor position
+  function createGlows(x, y, speed) {
+      // Generate fewer particles for a more subtle effect (e.g., just 1-2 particles)
+      let numParticles = 1;  // Just one particle for a very subtle effect
+      for (let i = 0; i < numParticles; i++) {
+          const glow = document.createElement('div');
+          glow.classList.add('glow'); // Changed class from "spark" to "glow"
+          document.body.appendChild(glow);
+
+          // Keep the particles small (3px to 5px in size)
+          const size = 3 + Math.random() * 2;  // Particle size remains small
+          glow.style.width = `${size}px`;
+          glow.style.height = `${size}px`;
+
+          // Position the glow at the cursor location
+          glow.style.left = `${x - size / 2}px`;
+          glow.style.top = `${y - size / 2}px`;
+
+          // Add random offsets to simulate spread of glows
+          const angle = Math.random() * Math.PI * 2; // Random direction
+          const speedFactor = Math.random() * 1 + 0.5; // Reduced speed factor for less distance
+          const velocityX = Math.cos(angle) * speedFactor;
+          const velocityY = Math.sin(angle) * speedFactor;
+
+          // Particle movement behavior
+          let particle = {
+              element: glow,
+              initialX: x,  // Initial position
+              initialY: y,  // Initial position
+              velocityX: velocityX,
+              velocityY: velocityY,
+              opacity: 1,
+              size: size  // Store the initial size
+          };
+
+          animateParticle(particle);
+      }
+  }
+
+  // Continuously animate each glow particle, shrinking and fading it
+  function animateParticle(particle) {
+      let interval = setInterval(() => {
+          // Update the position of the glow based on its velocity
+          particle.element.style.left = parseFloat(particle.element.style.left) + particle.velocityX + 'px';
+          particle.element.style.top = parseFloat(particle.element.style.top) + particle.velocityY + 'px';
+
+          // Shrink and fade the glow particle
+          particle.size -= 0.05;  // Shrink the particle gradually
+          particle.opacity -= 0.01;  // Fade out the particle gradually
+
+          // Apply the new size and opacity to the particle
+          particle.element.style.width = `${particle.size}px`;
+          particle.element.style.height = `${particle.size}px`;
+          particle.element.style.opacity = particle.opacity;
+
+          // Remove the particle once it gets too small or disappears
+          if (particle.opacity <= 0 || particle.size <= 0) {
+              clearInterval(interval);
+              particle.element.remove();
+          }
+      }, 16);  // Update every ~16ms (about 60 FPS)
+  }
+</script>
 </body>
 </html>
