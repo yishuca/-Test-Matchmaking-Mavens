@@ -1,161 +1,1029 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Review Feature</title>
-    <style>
-        /* CSS for styling the page */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f7f7f7;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Matchmaking Service - Find your perfect match with ease.">
+  <meta name="author" content="Yishuca Designs">
+  <title>Matchmaking Mavens</title>
 
-        .container {
-            width: 50%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
+  <!-- W3.CSS -->
+  <link rel="stylesheet" href="../css/w3.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antic+Didone&family=Gochi+Hand&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Reenie+Beanie&family=Shadows+Into+Light&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" href="../img/android-chrome-192x192.png" type="image/x-icon">
 
-        h2, h3 {
-            text-align: center;
-        }
+  <style>
+    .pointer {cursor: pointer;}
+    body {
+      font-family: 'Montserrat';
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: #d5d5d5;
+      color: #e0e0e0;
+      scroll-behavior: smooth;
+    }
 
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        form label {
-            margin: 10px 0 5px;
-        }
-
-        form input, form select, form textarea {
+    .center {
+            margin: auto;
+            width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
+        }
+
+    /* Navbar */
+    .w3-navbar, .w3-footer {
+            background-color: #008080;
+            color: white;
+            z-index: 3;
+        }
+        .w3-button-dark, .w3-button-black:hover {
+            background-color: #444;
+            color: white;
             border-radius: 5px;
         }
+        .w3-button-dark:hover, .w3-button-black:hover {
+            background-color: #555;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+        }
 
-        form button {
+    /* Hero Section Styling */
+    .hero {
+      position: relative;
+      background: url('../img/1112\(2\).gif') no-repeat center center/cover;
+      height: 100vh;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+      z-index: 1;
+    }
+
+    .hero img {
+      font-size: 4em;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: slideDown 2.5s forwards;
+      animation-delay: 0.5s;
+      color: #e0e0e0;
+    }
+
+    .hero p {
+      font-size: 2em;
+      margin-bottom: 500px;
+      opacity: 0;
+      animation: slideUp 2s forwards;
+      animation-delay: 1.5s;
+      color: #ccc;
+      padding: 0px 20px;
+    }
+
+    .hero s {
+      font-size: 1em;
+      margin-bottom: 100;
+      opacity: 0;
+      animation: slideUp 2s forwards;
+      animation-delay: 3s;
+      color: #ccc;
+    }
+
+    .hero q {
+      font-size: 1em;
+      margin-bottom: 100;
+      opacity: 0;
+      animation: slideUp 2s forwards;
+      animation-delay: 3s;
+      color: #ccc;
+    }
+
+    /* Hero Animation */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      0% { transform: translateY(500px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      0% { transform: translateY(-500px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Button Styling */
+    .button-primary {
+      background-color: #008080;
+      padding: 10px 25px;
+      font-size: 1.2em;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    }
+
+    /* Button Hover Effect */
+    .button-primary:hover {
+      transform: scale(1.1); /* Scale up on hover */
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Glowing effect */
+      filter: brightness(1.3); /* Brightness increase */
+    }
+
+    /* Hamburger Menu */
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1050;
+      display: none;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .hamburger div {
+      width: 35px;
+      height: 5px;
+      background-color: #656565;
+      margin: 6px 0;
+      transition: 0.4s;
+    }
+
+    /* Remove hover glow effect from Hamburger */
+    .hamburger:hover {
+      color: #1f3a61;
+      transform: scale(1.1);
+      box-shadow: none; /* Remove the glowing effect */
+    }
+
+    /* Hamburger Active State */
+    .hamburger.active div:nth-child(1) {
+      transform: translateY(11px) rotate(45deg);
+    }
+
+    .hamburger.active div:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active div:nth-child(3) {
+      transform: translateY(-11px) rotate(-45deg);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      background-color: #008080;
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+      color: white;
+    }
+
+    .sidebar a {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #f1f1f1;
+      display: block;
+      transition: 0.3s;
+      text-align: center;
+      border-radius: 5px;
+    }
+
+    /* Sidebar Link Hover Effect */
+    .sidebar a:hover {
+      color: #fff;
+      background-color: #008080;
+      box-shadow: 0 0 15px #ffffff; /* Glowing */
+      transform: scale(1.05); /* Slight scale-up */
+    }
+
+
+    /* Service Cards */
+    .services {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 30px;
+      text-align: center;
+      z-index: 0;
+    }
+
+    .service-card {
+      background-color: #3e3e3e;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8); /* Glowing effect */
+      transition:  1s ease;      
+      max-width: 350px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(50px); /* Initially off-screen */
+    }
+
+    /* Service Card Hover Effect */
+    .service-card:hover {
+      transform: translateY(-10px); /* Smooth upward movement */
+      scale: 1.0; /* Slightly scale up */
+      box-shadow: 0 12px 30px #ffffff; /* Stronger shadow */
+      filter: brightness(1); /* Glowing effect */
+      background-color: 3e3e3e;
+      transition:  1s ease;
+      transform: scale(1.1); /* Scale up on hover */
+    }
+
+    /* Service Card Hover Transition */
+    .service-card {
+      transition: transform 0.6s ease, box-shadow 0.6s ease, filter 0.6s ease, background-color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .service-card h3 {
+      margin-bottom: 15px;
+      font-size: 1.8em;
+      color: #008080;
+      transition: color .5s ease;
+    }
+
+    /* Service Card Title Hover */
+    .service-card:hover h3 {
+      color: #008080;
+    }
+
+    .service-card p {
+      color: #ffffff;
+      transition: color 0.3s ease;
+    }
+
+    /* Service Card Text Hover */
+    .service-card:hover p {
+      color: #ffffff;
+    }
+
+    /* Scroll Reveal Effect */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Smooth Scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #000000;
+      padding: 16px;
+      text-align: center;
+      color: #fff;
+    }
+
+    footer p {
+      font-size: 1.1em;
+      transition: transform 0.3s ease;
+    }
+
+    /* Footer Text Hover Effect */
+    footer p:hover {
+      transform: scale(1.05); /* Slight scale-up */
+      color: #1f3a61;
+    }
+
+    /* Media Queries */
+    @media screen and (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+    }
+
+    @media screen and (min-width: 769px) {
+      .hamburger {
+        display: none;
+      }
+    }
+
+    .form-container {
+            background-color: #3e3e3e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            color: #fff;
+            max-width: 600px;
+            margin: 100px auto;
+            opacity: 0;
+            transform: translateY(-30px); /* Start position */
+            animation: fadeInSlide 0.5s ease forwards; /* New subtle animation */
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: #008080;
+        }
+
+        .form-container label, .form-container input {
+            display: block;
+            width: 100%;
+        }
+
+        .form-container input {
             padding: 10px;
-            background-color: #4CAF50;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #2c2c2c;
+            color: #fff;
+        }
+
+        .form-container button {
+            background-color: #008080;
+            padding: 10px 20px;
+            font-size: 1.2em;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
         }
 
-        form button:hover {
-            background-color: #45a049;
+        .form-container button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
         }
 
-        #reviews-list {
-            margin-top: 20px;
+        .form-container p {
+            text-align: center;
+            color: #fff;
+            margin-top: 15px;
         }
 
-        .review-item {
-            background-color: #f9f9f9;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        /* Hide both forms initially */
+        .form-container-signin, .form-container-create {
+            display: none;
         }
 
-        .review-item .rating {
-            font-weight: bold;
+        /* Show specific form on button click */
+        .show-signin .form-container-signin {
+            display: block;
         }
-    </style>
+
+        .show-create .form-container-create {
+            display: block;
+        }
+
+        /* Subtle fade-in and slide-down animation */
+        @keyframes fadeInSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .spark {
+      position: absolute;
+      width: 2px;  /* Smaller width */
+      height: 2px; /* Smaller height */
+      background-color: rgba(255, 242, 141, 0.8); /* Sparkle color */
+      border-radius: 50%;
+      animation: sparkleFall 20s linear infinite; /* Slower falling duration */
+      z-index: 2;
+    }
+
+    @keyframes sparkleFall {
+      0% {
+        transform: translateY(0) scale(1); /* Start at the top of the viewport */
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) scale(0.5); /* End at the bottom of the viewport */
+        opacity: 0;
+      }
+    }
+
+    /* Create a container for the falling sparks */
+    .spark-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    .glow { /* Changed class name to spark */
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: rgba(255, 254, 179, 0.8); /* Light spark particles */
+            pointer-events: none; /* Prevent sparks from interfering with cursor events */
+            opacity: 1;
+            transition: transform 0.4s ease-out, opacity 1s ease-out; /* Smooth fading effect */
+            z-index: 9999; /* Ensure sparks are in the foreground */
+        }
+
+    /* Style the container to center the button */
+    .accordion-container {
+      display: flex;
+      justify-content: center; /* Horizontally center */
+      align-items: center;     /* Vertically center */
+    }
+
+    /* Style the accordion button */
+    .accordion {
+      color: white;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.4s;
+    }
+
+    /* Style the accordion content (hidden by default) */
+    .accordion-content {
+      background-color: #d5d5d5;
+      height: 0; /* Initially collapsed height */
+      opacity: 0; /* Initially hidden */
+      overflow: hidden; /* Hide content */
+      transition: height 2s ease-out, opacity 1s ease-out; /* Transition time for height and opacity */
+    }
+  </style>
+
+<style>
+  /* Styling for checkboxes */
+  .checkbox {
+    width: 15px;  /* Bigger size for checkbox */
+    height: 15px; /* Bigger size for checkbox */
+    -webkit-appearance: none; /* Remove default appearance */
+    appearance: none;
+    border-radius: 2px; /* Rounded corners for the checkbox */
+    background-color: white; /* White background */
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .checkbox:checked {
+    background-color: #008080; /* Background color when checked */
+    border-color: #008080; /* Border color when checked */
+  }
+
+    /* Add checkmark when checkbox is checked */
+    .checkbox:checked::after {
+    content: '✔'; /* Unicode checkmark */
+    position: absolute;
+    top: 50%; /* Vertically center */
+    left: 50%; /* Horizontally center */
+    transform: translate(-50%, -50%); /* Offset by 50% to fully center */
+    color: white; /* Checkmark color */
+    font-size: 14px; /* Size of the checkmark */
+  }
+
+/* Animation for smooth transformation */
+#formContainer {
+  position: relative;
+  transition: opacity 0.6s ease-in-out;
+}
+
+#thankYouMessage {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  position: absolute;
+  top: 50%;   /* Vertically center */
+  left: 50%;  /* Horizontally center */
+  transform: translate(-50%, -50%);  /* Adjust positioning to truly center */
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  display: none; /* Initially hidden */
+}
+
+#thankYouMessage.show {
+  opacity: 1;
+  display: block; /* Make the thank you message visible */
+}
+
+</style>
 </head>
 <body>
-    <div class="container">
-        <h2>Leave a Review</h2>
+    <!-- Navbar -->
+    <div class="w3-bar w3-top w3-xlarge w3-navbar w3-hide-small w3-card-4">
+      <a href="./index.html" class="w3-bar-item w3-button w3-mobile">Home</a>
+      <a href="./index.html#letsgetstarted" class="w3-bar-item w3-button w3-mobile">Let's get started
+      </a>
+      <a href="./volunteer.html" class="w3-bar-item w3-button w3-mobile">Volunteer</a>
+      <a href="./index.html#contact" class="w3-bar-item w3-button w3-mobile">Contact</a>
+  </div>
 
-        <!-- Review Form -->
-        <form id="review-form">
-            <label for="name">Name:</label>
-            <input type="text" id="name" required>
+  <!-- Hamburger Menu -->
+  <div class="hamburger" onclick="toggleSidebar()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
 
-            <label for="rating">Rating:</label>
-            <select id="rating" required>
-                <option value="1">1 Star</option>
-                <option value="2">2 Stars</option>
-                <option value="3">3 Stars</option>
-                <option value="4">4 Stars</option>
-                <option value="5">5 Stars</option>
-            </select>
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar w3-card-4"><br>
+    <a href="./index.html" class="w3-animate-opacity" onclick="closeSidebar()">Home</a>
+    <a href="./index.html#letsgetstarted" onclick="closeSidebar()">Let's get started</a>
+    <a href="./volunteer.html" onclick="closeSidebar()">Volunteer</a>
+    <a href="./index.html#contact" onclick="closeSidebar()">Contact</a>
+  </div>
 
-            <label for="review">Review:</label>
-            <textarea id="review" required></textarea>
-
-            <button type="submit">Submit Review</button>
-        </form>
-
-        <h3>Reviews:</h3>
-        <div id="reviews-list"></div>
+  <!-- Hero Section -->
+  <div class="spark-container"></div>
+  <section class="hero">
+    <div>
+        <img class="w3-border-black w3-card-4 w3-topbar w3-rightbar w3-leftbar w3-bottombar w3-animate-top w3-mobile" style="width: 80%;" src="../img/logo.gif" alt="MatchmakingHavenLogo">
+      <p class="w3-margin-bottom w3-xxlarge">Join us today and meet your next match!</p>
+      <s><br><br>
+      <button class="button-primary w3-text-black" onclick="scrollToSection('letsgetstarted')">Explore our services</button>
+      </s>
     </div>
+  </section>
 
-    <script>
-        // JavaScript for handling the reviews
-        const reviewForm = document.getElementById('review-form');
-        const reviewsList = document.getElementById('reviews-list');
+   <!-- Introduction --> <br id="letsgetstarted"><br><br>
+    <div class="w3-center center reveal accordion">
+  <button class="button-primary w3-text-black w3-xlarge accordion w3-hover-purple" style="max-width: 275px;">Why Matchmaking?<p class="w3-medium">(Click me)</p></button>
+  </div>
+  <div class="accordion-content">
+   <div id="letsgetstarted" class="w3-display-container w3-center" style="padding: 15px 15px;">
+    <br>
+    <p><b class="w3-text-purple w3-xxlarge w3-center reveal w3-padding-64" style="text-shadow: 0px 0px 0px #000000;">Matchmaking:</b></p>
 
-        // Retrieve saved reviews from localStorage or initialize an empty array
-        let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+      <p><b class="w3-text-purple w3-xlarge w3-center reveal w3-padding-64" style="text-shadow: 0px 0px0px #000000;">An Investment in Your Future</b></p>
+      <br>
+      <p class="w3-text-purple w3-xlarge w3-center reveal center" style="max-width: 600px;">In a world that's increasingly fast-paced and digitally driven, <br>finding love can feel like a daunting task.
+      <br><br><p class="reveal w3-text-purple w3-xlarge">That's where we come in.</p>
+      <br><p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;">We understand that finding a meaningful connection isn't just about chance; it's an investment in your future happiness.</p>
+      <br><p class="reveal w3-text-purple w3-xlarge center" style="max-width: 800px;">Our matchmaking services go far beyond traditional dating apps. We take the time to truly understand you, your values, your aspirations, and your unique love language.</p>
+      <br><p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;">We delve deep into your personality, lifestyle, and relationship history to identify your ideal match.</p>
+      <br><p class="reveal w3-text-purple w3-xlarge">Our process involves a meticulous combination of:</p>
+      <p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;"><b>* Personalized Consultations:</b><br> We conduct in-depth interviews to gain a comprehensive understanding of your desires and expectations.</p>
+      <br>
+      <p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;"><b>* Extensive Screening:</b><br> We meticulously screen potential matches to ensure they align with your criteria and values.</p>
+      <br>
+      <p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;"><b>* Intriguing Introductions:</b><br> We curate captivating introductions that spark interest and foster meaningful connections.</p>
+      <br>
+      <p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;"><b>* Ongoing Support:</b><br> We provide ongoing support and guidance throughout your dating journey, offering advice and encouragement every step of the way.</p>
+      <br><p class="reveal w3-text-purple w3-xlarge center" style="max-width: 800px;">By investing in our matchmaking services, you're investing in your future happiness. We'll help you navigate the complexities of modern dating, saving you time, energy, and heartache.</p>
+      <br><p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;">With our expertise and personalized approach, you'll have a higher chance of finding a lasting and fulfilling relationship.</p>
+      <br>
+      <p class="reveal w3-text-purple w3-xlarge center" style="max-width: 600px;">Are you ready to take the next step toward love? Let us be your matchmakers.</p>
+      <br>
+      <button class="close-btn button-primary w3-text-black w3-medium accordion w3-hover-purple">Close</button>
+    </p>
+   </div>
+  </div>
 
-        // Function to display all reviews
-        function displayReviews() {
-            reviewsList.innerHTML = '';  // Clear the reviews list
-            reviews.forEach((review, index) => {
-                const reviewElement = document.createElement('div');
-                reviewElement.classList.add('review-item');
-                
-                reviewElement.innerHTML = `
-                    <div><strong>Name:</strong> ${review.name}</div>
-                    <div><strong>Rating:</strong> ${'⭐'.repeat(review.rating)}</div>
-                    <div><strong>Review:</strong> ${review.review}</div>
-                `;
-                
-                reviewsList.appendChild(reviewElement);
-            });
+   <!-- Let's get started Section -->
+   <br><br>
+   <div class="w3-display-container w3-center reveal">
+    <div class="w3-center reveal">
+      <p><b class="w3-text-purple w3-xxlarge w3-padding-64" style="padding: 10px 10px;">Let's get started</b></p>
+    </div>
+    <div class=" w3-center reveal">
+      <p class="w3-text-purple w3-xlarge w3-center reveal" style="padding: 10px 10px;">Start with the first questionnaire below</p>
+    </div>
+   <section class="services">
+    <div class="service-card reveal">
+      <p class="w3-xlarge w3-text-purple"><b>Let us get to know you.</b></p>
+      <p class="w3-large">This provides us insights into your personality, relationship history, and what you seek in a partner, allowing us to match you with individuals who align with your values and expectations.</p>
+      <a href="https://forms.gle/RjNHVEofDGDfPq3E8" style="color: #008080;" class="w3-button button-primary reveal w3-bar w3-purple w3-xlarge w3-round">Take now</a>
+    </div>
+  </section>
+  </div>
+
+<!-- Let's get started Section -->
+<br><br>
+<div class="w3-display-container w3-center reveal">
+  <div class="w3-center reveal"></div><br>
+  <div class="service-card reveal center" id="formContainer">
+    <p><b class="w3-text-purple w3-xlarge w3-padding-64" style="padding: 10px 10px;">Stay Connected!</b></p>
+    <form id="contactForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfIyP7ni0YMWQEQg57LElcxweM7yCL15R0LXaZpOKi-HeRubw/formResponse" onsubmit="handleSubmit(event)">
+      <!-- Checkbox 1 -->
+      <input type="checkbox" id="checkbox1" class="checkbox" />
+      <label class="w3-large w3-text-white pointer" for="checkbox1">Keep up to date on singles events</label><br><br>
+      <!-- Checkbox 2 -->
+      <input type="checkbox" id="checkbox2" class="checkbox" />
+      <label class="w3-large w3-text-white pointer" for="checkbox2">Contact me about your matchmaking services</label><br><br>
+      <!-- Checkbox 3 -->
+      <input type="checkbox" id="checkbox3" class="checkbox" />
+      <label class="w3-large w3-text-white pointer" for="checkbox3">Fill out a free online profile so that if you may be a good fit for one of our clients, we can reach out to you!</label><br><br>
+      <!-- Phone or email input -->
+      <input type="text" id="phoneOrEmail" name="entry.911869334" placeholder="phone or email" required><br><br>
+      <!-- Hidden inputs for checkboxes -->
+      <input type="hidden" id="hidden1" name="entry.728608735">
+      <input type="hidden" id="hidden2" name="entry.647886455">
+      <input type="hidden" id="hidden3" name="entry.302090966">
+      <button style="color: #008080;" class="w3-button button-primary reveal w3-bar w3-purple w3-xlarge w3-round" type="submit">Submit</button>
+    </form>
+  </div>
+  <div id="thankYouMessage" class="service-card reveal center" style="display: none; text-align: center;">
+    <p class="w3-text-purple w3-xlarge w3-padding-64" style="padding: 10px 10px;">Thank you for your submission!</p>
+  </div>
+</div>
+
+
+   <!-- Volunteer Section -->
+   <br>
+   <div class="w3-display-container w3-center">
+    <p><b class="w3-text-purple w3-xxlarge w3-center reveal w3-padding-64">Want to help?</b></p>
+    <p class="w3-text-purple w3-xlarge w3-center reveal" style="padding: 10px 10px;">Join Our Volunteer Team at MatchmakingMavens.com!</p>
+     </div>
+   <section class="services">
+    <div class="service-card reveal">
+        <p><b class="w3-text-purple w3-xxlarge">Volunteer</b></p>
+        <p  class="w3-large">Your support can directly impact someone's journey to finding their perfect match. <br> <br>Fill out our volunteer application today and be part of something special!</p>
+        <br>
+        <a href="./volunteer.html" class="button-primary w3-button reveal w3-bar w3-purple w3-large w3-round">See how you can help</a>
+    </div>
+  </section><br>
+
+  <section style="position: relative; width: 100%;">
+    <!-- Image -->
+    <img class="w3-mobile" style="width: 100%;" src="../img/set.png" alt="MatchmakingHavenLogo">
+
+    <!-- Text Over Image -->
+    <div class="w3-mobile" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                color: white; font-size: 1.5rem; text-align: center; text-shadow: 1px 1px 3px rgba(0, 0, 0, 1.5);
+                padding: 5px 5px;">
+        <div class="reveal">
+        “Love can only be found through the act of loving.” <br> <i>— Paulo Coelho</i>
+        </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="w3-container w3-padding-64 w3-dark-grey" style="text-align:center;">
+    <div class="w3-xxlarge reveal" style="color:#008080;">
+        <b>Contact Us</b>
+    </div>
+    <div class="reveal w3-large">
+        <p>Have questions or need help? Reach out to us!</p>
+    </div>
+    <div class="reveal">
+        <p class="reveal w3-large">Brooklyn
+        <a class="reveal w3-hover-text-blue">(208) 960-5546</a><br>
+        </p>
+    </div>
+    <div class="reveal">
+      <p class="reveal w3-large">Tawnia
+      <a class="reveal w3-hover-text-blue">(208) 996-0490</a><br>
+      </p>
+  </div>
+  <div class="reveal">
+    <a class="reveal w3-hover-text-blue w3-medium" href="mailto:thematchmakingmavens@gmail.com"><p>thematchmakingmavens@gmail.com</p></a>
+</div>
+  <div class="reveal">
+    <a href="https://www.facebook.com/people/Matchmaking-Maven/61568559238387/?mibextid=ZbWKwL" class="reveal">
+    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0 0 64 64"
+    style="fill:#008080;">
+    <path d="M32,6C17.642,6,6,17.642,6,32c0,13.035,9.603,23.799,22.113,25.679V38.89H21.68v-6.834h6.433v-4.548	c0-7.529,3.668-10.833,9.926-10.833c2.996,0,4.583,0.223,5.332,0.323v5.965h-4.268c-2.656,0-3.584,2.52-3.584,5.358v3.735h7.785	l-1.055,6.834h-6.73v18.843C48.209,56.013,58,45.163,58,32C58,17.642,46.359,6,32,6z"></path>
+    </svg>
+  </a>
+</div>
+  </section>
+
+  <section style="position: relative; width: 100%;">
+    <!-- Image -->
+    <img class="w3-mobile" style="width: 100%;" src="../img/pexels-photo-14826452.jpg" alt="MatchmakingHavenLogo">
+
+    <!-- Text Over Image -->
+    <div class="w3-mobile" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                color: white; font-size: 1.5rem; text-align: center; text-shadow: 1px 1px 3px rgba(0, 0, 0, 1.5);
+                padding: 5px 5px;">
+        <div class="reveal">
+        “Real love doesn’t meet you at your best. It meets you in your mess.” <i>— S. Park</i>
+        </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p class="w3-hover-text-white w3-small" style="color: rgba(115, 115, 115, 0.8)">&copy; 2024 Powered by
+    <a href="https://www.google.com/search?q=Yishuca+Designs&stick=H4sIAAAAAAAA_-NgU1IxqDAzMU82NEk2MkqzNfirestoreIsrQyqEhLS7OwTDNPMrAwMjY1NEpexMofmVmcUZqcqOCSWpyZnlcMAI7WkV06AAAA&hl=en&mat=CcyCjVrczKUyElcBqiIDwuEnSkjtWn-T1yuTLkOZ0M76OHjKJvnvWiayBsnERJkKIrH5uH2yn5t0WsQl3sSypx1eetzXV58m4pBoi56C9U0JjRhXH8Z2uWJ_TesmeIFxW6A&authuser=1" class="pointer w3-hover-text-white w3-small" style="color: rgba(115, 115, 115, 0.8)">Yishuca Designs
+</a></p>
+  </footer>
+
+  <!-- JavaScript -->
+<script>
+    // Toggle Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      if (sidebar.style.width === '250px') {
+        sidebar.style.width = '0';
+        hamburger.classList.remove('active');
+      } else {
+        sidebar.style.width = '250px';
+        hamburger.classList.add('active');
+      }
+    }
+
+    // Close Sidebar when a link is clicked
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      sidebar.style.width = '0'; // Close the sidebar
+      hamburger.classList.remove('active'); // Reset hamburger icon
+    }
+
+        // Smooth Scroll to Section
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Scroll Reveal Effect
+    const revealElements = document.querySelectorAll('.reveal');
+
+    function revealOnScroll() {
+      revealElements.forEach(element => {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+          element.classList.add('visible');
         }
+      });
+    }
 
-        // Handle form submission
-        reviewForm.addEventListener('submit', function(event) {
-            event.preventDefault();  // Prevent page refresh on form submit
-            
-            // Get form values
-            const name = document.getElementById('name').value;
-            const rating = parseInt(document.getElementById('rating').value);
-            const reviewText = document.getElementById('review').value;
+    // Trigger reveal effect on scroll
+    window.addEventListener('scroll', revealOnScroll);
 
-            // Create a new review object
-            const newReview = {
-                name: name,
-                rating: rating,
-                review: reviewText
-            };
+    // Initial trigger for elements in viewport
+    revealOnScroll();
+  
 
-            // Add the new review to the reviews array
-            reviews.push(newReview);
+  // Function to show the sign-in form
+  function showSignin() {
+      document.getElementById('signinForm').style.display = 'none';
+      document.getElementById('createAccountForm').style.display = 'block';
+  }
 
-            // Save the updated reviews array to localStorage
-            localStorage.setItem('reviews', JSON.stringify(reviews));
+  // Function to show the create Account form
+  function showCreateAccount() {
+      document.getElementById('createAccountForm').style.display = 'none';
+      document.getElementById('signinForm').style.display = 'block';
+  }
 
-            // Clear the form inputs
-            reviewForm.reset();
+  // By default show the Sign-In form
+  showSignin();
+</script>
 
-            // Display the updated reviews list
-            displayReviews();
+<script>
+  // Function to create and animate sparks
+  function createSparks() {
+    const container = document.querySelector('.spark-container');
+    const maxSparks = 200; // Max sparks on screen at any time
+    const spawnInterval = 100; // Interval to spawn new sparks (milliseconds)
+
+    // Function to create a new spark element
+    function spawnSpark() {
+      if (container.children.length < maxSparks) {
+        const spark = document.createElement('div');
+        spark.classList.add('spark');
+      
+        // Random X position for each spark
+        spark.style.left = `${Math.random() * 100}vw`; 
+        // Remove animation delay to make them start falling right away
+        spark.style.animationDelay = '0s'; 
+        container.appendChild(spark);
+      }
+    }
+
+    // Spawn sparks continuously at the given interval
+    setInterval(spawnSpark, spawnInterval);
+  }
+
+  // Call the function to create the sparks
+  createSparks();
+</script>
+
+<script>
+  let cursorX = 0;
+  let cursorY = 0;
+  let lastX = 0;
+  let lastY = 0;
+  let lastTime = Date.now();
+  
+  // Function to handle mouse movement
+  function onMouseMove(event) {
+      if (event.type === 'mousemove') {
+          cursorX = event.clientX;
+          cursorY = event.clientY;
+      } else if (event.type === 'touchmove') {
+          // Get the touch position for mobile devices
+          cursorX = event.touches[0].clientX;
+          cursorY = event.touches[0].clientY;
+      }
+
+      // Calculate speed of cursor/touch movement
+      let currentTime = Date.now();
+      let speed = Math.sqrt((cursorX - lastX) ** 2 + (cursorY - lastY) ** 2) / (currentTime - lastTime) * 1000;
+      
+      // Create fewer particles for smaller movements
+      if (speed > 30) {  // Lowered threshold for fewer particles
+          createGlows(cursorX, cursorY, speed);  // Speed will influence particle behavior
+      }
+      
+      lastX = cursorX;
+      lastY = cursorY;
+      lastTime = currentTime;
+  }
+
+  // Listen for mousemove (desktop) and touchmove (mobile)
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('touchmove', onMouseMove);
+
+  // Create a burst of small white glowing particles at the cursor position
+  function createGlows(x, y, speed) {
+      // Generate fewer particles for a more subtle effect (e.g., just 1-2 particles)
+      let numParticles = 1;  // Just one particle for a very subtle effect
+      for (let i = 0; i < numParticles; i++) {
+          const glow = document.createElement('div');
+          glow.classList.add('glow'); // Changed class from "spark" to "glow"
+          document.body.appendChild(glow);
+
+          // Keep the particles small (3px to 5px in size)
+          const size = 3 + Math.random() * 2;  // Particle size remains small
+          glow.style.width = `${size}px`;
+          glow.style.height = `${size}px`;
+
+          // Position the glow at the cursor location
+          glow.style.left = `${x - size / 2}px`;
+          glow.style.top = `${y - size / 2}px`;
+
+          // Add random offsets to simulate spread of glows
+          const angle = Math.random() * Math.PI * 2; // Random direction
+          const speedFactor = Math.random() * 1 + 0.5; // Reduced speed factor for less distance
+          const velocityX = Math.cos(angle) * speedFactor;
+          const velocityY = Math.sin(angle) * speedFactor;
+
+          // Particle movement behavior
+          let particle = {
+              element: glow,
+              initialX: x,  // Initial position
+              initialY: y,  // Initial position
+              velocityX: velocityX,
+              velocityY: velocityY,
+              opacity: 1,
+              size: size  // Store the initial size
+          };
+
+          animateParticle(particle);
+      }
+  }
+
+  // Continuously animate each glow particle, shrinking and fading it
+  function animateParticle(particle) {
+      let interval = setInterval(() => {
+          // Update the position of the glow based on its velocity
+          particle.element.style.left = parseFloat(particle.element.style.left) + particle.velocityX + 'px';
+          particle.element.style.top = parseFloat(particle.element.style.top) + particle.velocityY + 'px';
+
+          // Shrink and fade the glow particle
+          particle.size -= 0.05;  // Shrink the particle gradually
+          particle.opacity -= 0.01;  // Fade out the particle gradually
+
+          // Apply the new size and opacity to the particle
+          particle.element.style.width = `${particle.size}px`;
+          particle.element.style.height = `${particle.size}px`;
+          particle.element.style.opacity = particle.opacity;
+
+          // Remove the particle once it gets too small or disappears
+          if (particle.opacity <= 0 || particle.size <= 0) {
+              clearInterval(interval);
+              particle.element.remove();
+          }
+      }, 16);  // Update every ~16ms (about 60 FPS)
+  }
+</script>
+
+<script>
+    // Get the accordion button and the content
+    var accordion = document.querySelector(".accordion");
+    var content = document.querySelector(".accordion-content");
+    var closeButton = document.querySelector(".close-btn");
+
+    // Add event listener for the accordion button to toggle open and close
+    accordion.addEventListener("click", function() {
+      // Toggle the active class on this button to change its text
+      this.classList.toggle("active");
+
+      // If content is already open, collapse it
+      if (content.style.height && content.style.height !== "0px") {
+        content.style.height = "0";  // Collapse
+        content.style.opacity = 0;   // Fade out
+      } else {
+        // Otherwise, expand the content
+        content.style.height = content.scrollHeight + "px";  // Expand to content height
+        content.style.opacity = 1;  // Fade in
+
+        // Smooth scroll to the expanded content
+        setTimeout(function() {
+          content.scrollIntoView({ behavior: "smooth" });
+        }, 200);  // Add slight delay to ensure expanding happens first
+      }
+    });
+
+    // Close button functionality (close the content)
+    closeButton.addEventListener("click", function() {
+      content.style.height = "0";  // Collapse
+      content.style.opacity = 0;   // Fade out
+      accordion.classList.remove("active");  // Optionally remove the active state from the button
+      
+      // Smooth scroll back to the accordion button
+      setTimeout(function() {
+        window.scrollTo({
+          top: accordion.offsetTop,  // Scroll to the top of the accordion button
+          behavior: 'smooth'         // Smooth scroll
         });
+      }, 200);  // Add slight delay to ensure collapsing happens first
+    });
+  </script>
 
-        // Display the reviews when the page loads
-        displayReviews();
-    </script>
+<script>
+  document.getElementById("contactForm").addEventListener("submit", function(event) {
+    // Get the value from the "phone or email" field
+    var phoneOrEmail = document.getElementById("phoneOrEmail").value;
+
+    // If checkbox 1 is checked, copy the value to hidden input for checkbox 1
+    if (document.getElementById("checkbox1").checked) {
+      document.getElementById("hidden1").value = phoneOrEmail;
+    }
+
+    // If checkbox 2 is checked, copy the value to hidden input for checkbox 2
+    if (document.getElementById("checkbox2").checked) {
+      document.getElementById("hidden2").value = phoneOrEmail;
+    }
+
+    // If checkbox 3 is checked, copy the value to hidden input for checkbox 3
+    if (document.getElementById("checkbox3").checked) {
+      document.getElementById("hidden3").value = phoneOrEmail;
+    }
+  });
+</script>
+
+<script>
+  // Function to handle form submission asynchronously
+  document.getElementById('contactForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission (which causes the page reload)
+
+    var form = this;
+    var formData = new FormData(form);
+
+    // Create a new AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', form.action, true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+      }
+    };
+    xhr.send(formData); // Send the form data
+  });
+
+// Function to handle form submission and animation
+function handleSubmit(event) {
+  event.preventDefault(); // Prevents form from actually submitting to the server
+
+  // Hide the form with animation
+  const formContainer = document.getElementById('formContainer');
+  formContainer.style.opacity = 0;
+
+  // Show the "Thank You" message after a delay
+  const thankYouMessage = document.getElementById('thankYouMessage');
+  setTimeout(function () {
+    thankYouMessage.style.display = 'block';
+    thankYouMessage.classList.add('show');
+  }, 500); // Delays the showing of the "Thank You" message by 0.5s
+}
+
+</script>
+
 </body>
 </html>
