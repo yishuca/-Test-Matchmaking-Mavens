@@ -1,15 +1,12 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyAyWRKIdxgqiSXX5qNVYsRob8SRNqks64g",
-    authDomain: "matchmakingmavenssignin-b1843.firebaseapp.com",
-    databaseURL: "https://matchmakingmavenssignin-b1843-default-rtdb.firebaseio.com",
-    projectId: "matchmakingmavenssignin-b1843",
-    storageBucket: "matchmakingmavenssignin-b1843.firebasestorage.app",
-    messagingSenderId: "215663945550",
-    appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
-  };
-
-
-
+  apiKey: "AIzaSyAyWRKIdxgqiSXX5qNVYsRob8SRNqks64g",
+  authDomain: "matchmakingmavenssignin-b1843.firebaseapp.com",
+  databaseURL: "https://matchmakingmavenssignin-b1843-default-rtdb.firebaseio.com",
+  projectId: "matchmakingmavenssignin-b1843",
+  storageBucket: "matchmakingmavenssignin-b1843.firebasestorage.app",
+  messagingSenderId: "215663945550",
+  appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
+};
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
