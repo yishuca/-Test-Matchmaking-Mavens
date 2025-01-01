@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -6,7 +6,7 @@
   <title>Matchmaking Website</title>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-  <!-- Use Firebase 8.x SDK (namespaced version) -->
+  <!-- Firebase 8.x SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -84,48 +84,35 @@
       cursor: pointer;
     }
 
+    .user-card.selected {
+      background-color: #90EE90;  /* Light green background */
+      color: #006400;  /* Dark green text */
+    }
+
     @media (max-width: 768px) {
       .user-card {
         width: 100%;
       }
     }
-
-    .result-section {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .result-section h3 {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .result-list {
-      list-style-type: none;
-      padding: 0;
-      font-size: 18px;
-    }
   </style>
 
   <script>
     // Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyAyWRKIdxgqiSXX5qNVYsRob8SRNqks64g",
-    authDomain: "matchmakingmavenssignin-b1843.firebaseapp.com",
-    databaseURL: "https://matchmakingmavenssignin-b1843-default-rtdb.firebaseio.com",
-    projectId: "matchmakingmavenssignin-b1843",
-    storageBucket: "matchmakingmavenssignin-b1843.firebasestorage.app",
-    messagingSenderId: "215663945550",
-    appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
-  };
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyWRKIdxgqiSXX5qNVYsRob8SRNqks64g",
+      authDomain: "matchmakingmavenssignin-b1843.firebaseapp.com",
+      databaseURL: "https://matchmakingmavenssignin-b1843-default-rtdb.firebaseio.com",
+      projectId: "matchmakingmavenssignin-b1843",
+      storageBucket: "matchmakingmavenssignin-b1843.firebasestorage.app",
+      messagingSenderId: "215663945550",
+      appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
+    };
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
-    // Initialize Firestore and Realtime Database
+    // Initialize Firestore
     const firestore = firebase.firestore();
-    const realTimeDb = firebase.database();
 
     // Store the logged-in user's name for later reference
     let loggedInUserName = '';
@@ -156,7 +143,6 @@ const firebaseConfig = {
         });
         loggedInUserName = userName; // Save the logged-in user name
         localStorage.setItem("loggedInUserName", userName);  // Remember user with localStorage
-        console.log("User added with ID: ", userRef.id);
         document.getElementById("welcomeMessage").innerText = `Welcome, ${userName}!`;
         document.getElementById("userForm").style.display = "block";
         loadUsers();  // Load users to select interests
@@ -187,6 +173,7 @@ const firebaseConfig = {
     async function handleInterestSubmit() {
       const selectedUsers = [];
       const checkboxes = document.querySelectorAll(".userCheckbox:checked");
+      
       checkboxes.forEach((checkbox) => {
         selectedUsers.push(checkbox.getAttribute('data-name')); // Store the actual user name
       });
@@ -201,33 +188,31 @@ const firebaseConfig = {
           });
         });
 
-        document.getElementById("interestedUsers").innerText = `You are interested in:`;
-        selectedUsers.forEach(userName => {
-          const p = document.createElement("p");
-          p.textContent = userName;
-          document.getElementById("interestedUsers").appendChild(p);
-        });
-
-        document.getElementById("notInterestedUsers").innerText = `You are NOT interested in:`;
-        const nonInterestedUsers = getNonInterestedUsers(selectedUsers);
-        nonInterestedUsers.forEach(userName => {
-          const p = document.createElement("p");
-          p.textContent = userName;
-          document.getElementById("notInterestedUsers").appendChild(p);
-        });
+        // Highlight selected users
+        highlightSelectedUsers(selectedUsers);
 
       } catch (e) {
         console.error("Error handling interest: ", e);
       }
     }
 
-    // Get non-interested users for display
-    function getNonInterestedUsers(selectedUsers) {
-      const allUsers = Array.from(document.querySelectorAll(".userCheckbox"));
-      return allUsers
-        .filter((checkbox) => !selectedUsers.includes(checkbox.getAttribute('data-name')))
-        .map((checkbox) => checkbox.parentElement.textContent.trim());
+    // Function to highlight selected users by changing their color to green
+    function highlightSelectedUsers(selectedUsers) {
+      const allUserCards = document.querySelectorAll(".user-card");
+      
+      allUserCards.forEach(card => {
+        const checkbox = card.querySelector(".userCheckbox");
+        const userName = checkbox.getAttribute("data-name");
+
+        // If the user is selected, change the background color to green
+        if (selectedUsers.includes(userName)) {
+          card.classList.add("selected"); // Add green background
+        } else {
+          card.classList.remove("selected"); // Remove green background
+        }
+      });
     }
+
   </script>
 </head>
 <body>
@@ -248,13 +233,6 @@ const firebaseConfig = {
       <h3>Select Users You Are Interested In</h3>
       <div id="usersList" class="users-list"></div>
       <button onclick="handleInterestSubmit()" class="button button-green">Submit Interest</button>
-    </div>
-
-    <!-- Results Section -->
-    <div id="results" class="result-section">
-      <h3>Results:</h3>
-      <div id="interestedUsers"></div>
-      <div id="notInterestedUsers"></div>
     </div>
 
   </div>
