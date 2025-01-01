@@ -6,7 +6,7 @@
   <title>Matchmaking Website</title>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-  <!-- Firebase SDK -->
+  <!-- Use Firebase 8.x SDK (namespaced version) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -109,33 +109,35 @@
 
   <script>
     // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyAyWRKIdxgqiSXX5qNVYsRob8SRNqks64g",
-      authDomain: "matchmakingmavenssignin-b1843.firebaseapp.com",
-      databaseURL: "https://matchmakingmavenssignin-b1843-default-rtdb.firebaseio.com",
-      projectId: "matchmakingmavenssignin-b1843",
-      storageBucket: "matchmakingmavenssignin-b1843.firebasestorage.app",
-      messagingSenderId: "215663945550",
-      appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
-    };
+const firebaseConfig = {
+    apiKey: "AIzaSyAyWRKIdxgqiSXX5qNVYsRob8SRNqks64g",
+    authDomain: "matchmakingmavenssignin-b1843.firebaseapp.com",
+    databaseURL: "https://matchmakingmavenssignin-b1843-default-rtdb.firebaseio.com",
+    projectId: "matchmakingmavenssignin-b1843",
+    storageBucket: "matchmakingmavenssignin-b1843.firebasestorage.app",
+    messagingSenderId: "215663945550",
+    appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
+  };
+
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
     // Initialize Firestore and Realtime Database
     const firestore = firebase.firestore();
+    const realTimeDb = firebase.database();
 
     // Store the logged-in user's name for later reference
     let loggedInUserName = '';
 
     // Check if the user is already logged in (using localStorage)
-    window.onload = async () => {
+    window.onload = () => {
       const storedUserName = localStorage.getItem("loggedInUserName");
       if (storedUserName) {
         loggedInUserName = storedUserName;
         document.getElementById("welcomeMessage").innerText = `Welcome back, ${loggedInUserName}!`;
         document.getElementById("userForm").style.display = "block";
-        await loadUsers();  // Load users to select interests
+        loadUsers();  // Load users to select interests
       }
     };
 
@@ -157,7 +159,7 @@
         console.log("User added with ID: ", userRef.id);
         document.getElementById("welcomeMessage").innerText = `Welcome, ${userName}!`;
         document.getElementById("userForm").style.display = "block";
-        await loadUsers();  // Load users to select interests
+        loadUsers();  // Load users to select interests
       } catch (e) {
         console.error("Error adding user: ", e);
       }
@@ -226,38 +228,11 @@
         .filter((checkbox) => !selectedUsers.includes(checkbox.getAttribute('data-name')))
         .map((checkbox) => checkbox.parentElement.textContent.trim());
     }
-
-    // Clear user data on logout and reset Firestore
-    async function clearUserData() {
-      try {
-        // Remove from localStorage
-        localStorage.removeItem("loggedInUserName");
-
-        // Reset interests and state in Firestore
-        const userRef = await firestore.collection("users").where("name", "==", loggedInUserName);
-        const userSnapshot = await userRef.get();
-
-        userSnapshot.forEach(async (doc) => {
-          await firestore.collection("users").doc(doc.id).update({
-            interests: []  // Clear interests
-          });
-        });
-
-        // Clear UI and reload page
-        loggedInUserName = '';
-        document.getElementById("welcomeMessage").innerText = '';
-        document.getElementById("userForm").style.display = "none";
-        location.reload();  // Reload to clear session on all devices
-
-      } catch (e) {
-        console.error("Error clearing user data: ", e);
-        alert("There was an error clearing the user data.");
-      }
-    }
   </script>
 </head>
 <body>
 
+  <!-- Main container -->
   <div class="container">
 
     <!-- Name Entry Form -->
@@ -281,9 +256,6 @@
       <div id="interestedUsers"></div>
       <div id="notInterestedUsers"></div>
     </div>
-
-    <!-- Clear LocalStorage Button -->
-    <button onclick="clearUserData()" class="button button-blue">Clear Data and Logout</button>
 
   </div>
 
