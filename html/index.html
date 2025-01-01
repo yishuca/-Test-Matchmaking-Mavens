@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,10 +57,18 @@
       border: none;
     }
 
+    .button-blue:hover {
+      opacity: 0.8;
+    }
+
     .button-green {
       background-color: #007BFF;
       color: white;
       border: none;
+    }
+
+    .button-green:hover {
+      opacity: 0.8;
     }
 
     .users-list {
@@ -130,9 +139,9 @@
 
     // Handle user submit to Firestore
     async function handleUserSubmit() {
-      const userName = document.getElementById("nameInput").value;
+      const userName = document.getElementById("nameInput").value.trim();
       if (!userName) {
-        alert("Please enter your name.");
+        alert("Please enter a valid name.");
         return;
       }
 
@@ -157,15 +166,26 @@
       const usersList = document.getElementById("usersList");
       usersList.innerHTML = ""; // Clear the current list
 
+      // Create an array to store the users
+      const users = [];
+
       querySnapshot.forEach((doc) => {
         const user = doc.data();
         const userName = user.name;
         if (userName !== loggedInUserName) {  // Filter out the logged-in user's name
-          const userDiv = document.createElement("div");
-          userDiv.classList.add("user-card");
-          userDiv.innerHTML = `<label><input type="checkbox" value="${doc.id}" class="userCheckbox" data-name="${userName}"> ${userName}</label>`;
-          usersList.appendChild(userDiv);
+          users.push({ id: doc.id, name: userName });
         }
+      });
+
+      // Sort the users array alphabetically by name
+      users.sort((a, b) => a.name.localeCompare(b.name));
+
+      // Now, loop through the sorted users and create the user cards
+      users.forEach((user) => {
+        const userDiv = document.createElement("div");
+        userDiv.classList.add("user-card");
+        userDiv.innerHTML = `<label><input type="checkbox" value="${user.id}" class="userCheckbox" data-name="${user.name}"> ${user.name}</label>`;
+        usersList.appendChild(userDiv);
       });
 
       // Reapply selected users from localStorage
@@ -181,6 +201,11 @@
       checkboxes.forEach((checkbox) => {
         selectedUsers.push(checkbox.getAttribute('data-name')); // Store the actual user name
       });
+
+      if (selectedUsers.length === 0) {
+        alert("Please select at least one user.");
+        return;
+      }
 
       try {
         const userRef = firestore.collection("users").where("name", "==", loggedInUserName);
@@ -222,6 +247,7 @@
     }
   </script>
 </head>
+
 <body>
 
   <!-- Main container -->
@@ -245,4 +271,5 @@
   </div>
 
 </body>
+
 </html>
