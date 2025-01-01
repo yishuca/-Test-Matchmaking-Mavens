@@ -119,12 +119,12 @@
     appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
   };
 
+
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
     // Initialize Firestore and Realtime Database
     const firestore = firebase.firestore();
-    const realTimeDb = firebase.database();
 
     // Store the logged-in user's name for later reference
     let loggedInUserName = '';
@@ -135,13 +135,10 @@
       if (storedUserName) {
         loggedInUserName = storedUserName;
         document.getElementById("welcomeMessage").innerText = `Welcome back, ${loggedInUserName}!`;
-        document.getElementById("nameEntryForm").style.display = "none"; // Hide name entry form
-        document.getElementById("userForm").style.display = "block"; // Show user interest form
+        document.getElementById("userForm").style.display = "block";
+        document.getElementById("nameInput").disabled = true;  // Disable name input
+        document.getElementById("nameSubmitBtn").disabled = true; // Disable submit button
         loadUsers();  // Load users to select interests
-      } else {
-        // If no user is logged in, show the name entry form
-        document.getElementById("nameEntryForm").style.display = "block";
-        document.getElementById("userForm").style.display = "none";
       }
     };
 
@@ -172,8 +169,9 @@
         localStorage.setItem("loggedInUserName", userName);  // Remember user with localStorage
         console.log("User added with ID: ", userRef.id);
         document.getElementById("welcomeMessage").innerText = `Welcome, ${userName}!`;
-        document.getElementById("nameEntryForm").style.display = "none"; // Hide name entry form
-        document.getElementById("userForm").style.display = "block"; // Show user interest form
+        document.getElementById("userForm").style.display = "block";
+        document.getElementById("nameInput").disabled = true; // Disable name input
+        document.getElementById("nameSubmitBtn").disabled = true; // Disable submit button
         loadUsers();  // Load users to select interests
       } catch (e) {
         console.error("Error adding user: ", e);
@@ -243,6 +241,12 @@
         .filter((checkbox) => !selectedUsers.includes(checkbox.getAttribute('data-name')))
         .map((checkbox) => checkbox.parentElement.textContent.trim());
     }
+
+    // Function to clear localStorage and reload
+    function clearLocalStorage() {
+      localStorage.clear();
+      window.location.reload();
+    }
   </script>
 </head>
 <body>
@@ -250,12 +254,10 @@
   <!-- Main container -->
   <div class="container">
 
-    <!-- Name Entry Form (This is the form to be hidden once logged in) -->
-    <div id="nameEntryForm">
-      <h2>Enter Your Name</h2>
-      <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial">
-      <button onclick="handleUserSubmit()" class="button button-blue">Submit</button>
-    </div>
+    <!-- Name Entry Form -->
+    <h2>Enter Your Name</h2>
+    <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial">
+    <button id="nameSubmitBtn" onclick="handleUserSubmit()" class="button button-blue">Submit</button>
 
     <!-- Welcome Message -->
     <div id="welcomeMessage" class="welcome-message"></div>
@@ -265,6 +267,9 @@
       <h3>Select Users You Are Interested In</h3>
       <div id="usersList" class="users-list"></div>
       <button onclick="handleInterestSubmit()" class="button button-green">Submit Interest</button>
+      <br><br>
+      <!-- Logout button to clear localStorage -->
+      <button onclick="clearLocalStorage()" class="button button-blue">Log Out</button>
     </div>
 
     <!-- Results Section -->
