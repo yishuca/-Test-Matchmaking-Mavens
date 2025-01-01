@@ -119,7 +119,6 @@
     appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
   };
 
-
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
@@ -136,8 +135,13 @@
       if (storedUserName) {
         loggedInUserName = storedUserName;
         document.getElementById("welcomeMessage").innerText = `Welcome back, ${loggedInUserName}!`;
-        document.getElementById("userForm").style.display = "block";
+        document.getElementById("nameEntryForm").style.display = "none"; // Hide name entry form
+        document.getElementById("userForm").style.display = "block"; // Show user interest form
         loadUsers();  // Load users to select interests
+      } else {
+        // If no user is logged in, show the name entry form
+        document.getElementById("nameEntryForm").style.display = "block";
+        document.getElementById("userForm").style.display = "none";
       }
     };
 
@@ -168,7 +172,8 @@
         localStorage.setItem("loggedInUserName", userName);  // Remember user with localStorage
         console.log("User added with ID: ", userRef.id);
         document.getElementById("welcomeMessage").innerText = `Welcome, ${userName}!`;
-        document.getElementById("userForm").style.display = "block";
+        document.getElementById("nameEntryForm").style.display = "none"; // Hide name entry form
+        document.getElementById("userForm").style.display = "block"; // Show user interest form
         loadUsers();  // Load users to select interests
       } catch (e) {
         console.error("Error adding user: ", e);
@@ -245,10 +250,12 @@
   <!-- Main container -->
   <div class="container">
 
-    <!-- Name Entry Form -->
-    <h2>Enter Your Name</h2>
-    <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial">
-    <button onclick="handleUserSubmit()" class="button button-blue">Submit</button>
+    <!-- Name Entry Form (This is the form to be hidden once logged in) -->
+    <div id="nameEntryForm">
+      <h2>Enter Your Name</h2>
+      <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial">
+      <button onclick="handleUserSubmit()" class="button button-blue">Submit</button>
+    </div>
 
     <!-- Welcome Message -->
     <div id="welcomeMessage" class="welcome-message"></div>
