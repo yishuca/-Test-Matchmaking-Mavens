@@ -150,6 +150,16 @@
       }
 
       try {
+        // Check if the name already exists in Firestore
+        const userSnapshot = await firestore.collection("users")
+          .where("name", "==", userName).get();
+
+        if (!userSnapshot.empty) {
+          alert("This name is already taken. Please choose a different one.");
+          return;
+        }
+
+        // If name is unique, proceed with adding the user
         const userRef = await firestore.collection("users").add({
           name: userName,
           interests: []
