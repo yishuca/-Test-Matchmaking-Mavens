@@ -1,45 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Name Entry</title>
-    <!-- W3.CSS for basic styling -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-</head>
-<body>
-
-<div class="w3-container w3-center w3-padding-32">
-    <h2>Enter Your Name for the Event</h2>
-
-    <form id="userForm" class="w3-container w3-margin-top">
-        <input type="text" id="firstName" class="w3-input" placeholder="First Name" required>
-        <input type="text" id="lastInitial" class="w3-input" placeholder="Last Initial" required>
-        <button type="submit" class="w3-btn w3-blue">Enter Name</button>
-    </form>
-
-    <div id="userList" class="w3-margin-top">
-        <h3>Other Users:</h3>
-        <ul id="userListItems"></ul>
-    </div>
-</div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
-    <script type="module" src="../app.js"></script>
-</body>
-
-<script type="module">
-  // Firebase SDK (as ES modules)
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-  import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
-  import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Name Selection</title>
   
-  // Firebase configuration
-  const firebaseConfig = {
+  <!-- Firebase Modular SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
+    import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
+    import { getDatabase, ref, set, get, update } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js';
+
+    const firebaseConfig = {
     apiKey: "AIzaSyAyWRKIdxgqiSXX5qNVYsRob8SRNqks64g",
     authDomain: "matchmakingmavenssignin-b1843.firebaseapp.com",
     databaseURL: "https://matchmakingmavenssignin-b1843-default-rtdb.firebaseio.com",
@@ -49,10 +21,171 @@
     appId: "1:215663945550:web:3a1a5a5f047d2525c6e01f"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-</script>
 
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // Handle name form submission
+    document.getElementById('nameForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value;
+      const lastInitial = document.getElementById('lastInitial').value;
+      
+      // Log in anonymously with Firebase Authentication
+      signInAnonymously(auth)
+        .then(() => {
+          const user = auth.currentUser;
+          const userId = user.uid;
+          
+          // Save user data to Firebase Realtime Database
+          set(ref(db, 'users/' + userId), {
+            firstName: firstName,
+            lastInitial: lastInitial,
+            selections: []
+          });
+          
+          // Show user selection page
+          showUserSelectionPage();
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    });
+
+    // Show user selection page
+    function showUserSelectionPage() {
+      document.querySelector('#selectionPage').style.display = 'block';
+      document.querySelector('#nameForm').style.display = 'none';
+      
+      // Load and display users
+      loadUsers();
+    }
+
+    // Load list of users from Firebase
+    function loadUsers() {
+      const usersRef = ref(db, 'users');
+      get(usersRef).then(snapshot => {
+        const users = snapshot.val();
+        const userList = document.getElementById('userList');
+        userList.innerHTML = ''; // Clear current list
+        
+        for (const userId in users) {
+          if (users.hasOwnProperty(userId)) {
+            const user = users[userId];
+            const userElement = document.createElement('div');
+            userElement.innerHTML = `
+              <input type="checkbox" id="select-${userId}" onclick="handleSelection('${userId}')">
+              ${user.firstName} ${user.lastInitial}
+            `;
+            userList.appendChild(userElement);
+          }
+        }
+      });
+    }
+
+    // Handle user selection
+    function handleSelection(userId) {
+      const selected = document.getElementById(`select-${userId}`).checked;
+      const user = auth.currentUser;
+      
+      // Save selection to current user
+      const userRef = ref(db, 'users/' + user.uid);
+      get(userRef).then(snapshot => {
+        const userData = snapshot.val();
+        const selections = userData.selections || [];
+        
+        if (selected) {
+          selections.push(userId);
+        } else {
+          const index = selections.indexOf(userId);
+          if (index > -1) {
+            selections.splice(index, 1);
+          }
+        }
+        
+        update(userRef, { selections: selections });
+      });
+    }
+
+    // Function to show mutual selections
+    window.showMutualSelections = function() {
+      const user = auth.currentUser;
+      
+      const usersRef = ref(db, 'users');
+      get(usersRef).then(snapshot => {
+        const users = snapshot.val();
+        const mutualUsers = [];
+        
+        for (const userId in users) {
+          if (users.hasOwnProperty(userId) && userId !== user.uid) {
+            const selectedByUser = users[userId].selections.includes(user.uid);
+            const selectedUser = users[user.uid].selections.includes(userId);
+            
+            if (selectedByUser && selectedUser) {
+              mutualUsers.push(`${users[userId].firstName} ${users[userId].lastInitial}`);
+            }
+          }
+        }
+        
+        // Display mutual selections
+        const mutualList = document.getElementById('mutualUsersList');
+        mutualList.innerHTML = '';
+        mutualUsers.forEach(userName => {
+          const userElement = document.createElement('div');
+          userElement.innerHTML = userName;
+          mutualList.appendChild(userElement);
+        });
+        
+        document.getElementById('mutualPage').style.display = 'block';
+        document.getElementById('selectionPage').style.display = 'none';
+      });
+    }
+
+    // Go back to the user selection page
+    function goBackToSelectionPage() {
+      document.getElementById('mutualPage').style.display = 'none';
+      document.getElementById('selectionPage').style.display = 'block';
+    }
+  </script>
+
+  <!-- W3.CSS -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .selected-user { color: green; }
+    .unselected-user { color: red; }
+  </style>
+</head>
+<body>
+
+<!-- Page: Enter Name -->
+<div class="w3-container">
+  <h2>Enter Your Name</h2>
+  <form id="nameForm">
+    <label for="firstName">First Name</label>
+    <input type="text" id="firstName" class="w3-input" required>
+    <label for="lastInitial">Last Initial</label>
+    <input type="text" id="lastInitial" class="w3-input" required>
+    <button type="submit" class="w3-button w3-blue">Enter</button>
+  </form>
+</div>
+
+<!-- Page: User Selection -->
+<div class="w3-container" id="selectionPage" style="display:none;">
+  <h2>Select Users for Event</h2>
+  <div id="userList"></div>
+  <button class="w3-button w3-blue" onclick="showMutualSelections()">Show Mutual Selections</button>
+</div>
+
+<!-- Page: Mutual Selections -->
+<div class="w3-container" id="mutualPage" style="display:none;">
+  <h2>Mutually Selected Users</h2>
+  <div id="mutualUsersList"></div>
+  <button class="w3-button w3-blue" onclick="goBackToSelectionPage()">Back</button>
+</div>
+
+</body>
 </html>
