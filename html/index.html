@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,7 +9,7 @@
   <!-- Firebase 8.x SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
   <style>
     /* Custom Styles */
@@ -85,8 +85,8 @@
     }
 
     .user-card.selected {
-      background-color: #90EE90;  /* Light green background */
-      color: #006400;  /* Dark green text */
+      background-color: #90EE90;
+      color: #006400;
     }
 
     @media (max-width: 768px) {
@@ -111,10 +111,10 @@
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
-    // Initialize Firestore
+    // Initialize Firestore and Auth
     const firestore = firebase.firestore();
+    const auth = firebase.auth();
 
-    // Store the logged-in user's name for later reference
     let loggedInUserName = '';
 
     // Check if the user is already logged in (using localStorage)
@@ -158,15 +158,19 @@
       usersList.innerHTML = ""; // Clear the current list
 
       querySnapshot.forEach((doc) => {
-        let user = doc.data();
-        let userName = user.name;
+        const user = doc.data();
+        const userName = user.name;
         if (userName !== loggedInUserName) {  // Filter out the logged-in user's name
-          let userDiv = document.createElement("div");
+          const userDiv = document.createElement("div");
           userDiv.classList.add("user-card");
           userDiv.innerHTML = `<label><input type="checkbox" value="${doc.id}" class="userCheckbox" data-name="${userName}"> ${userName}</label>`;
           usersList.appendChild(userDiv);
         }
       });
+
+      // Reapply selected users from localStorage
+      const selectedUsers = JSON.parse(localStorage.getItem("selectedUsers")) || [];
+      highlightSelectedUsers(selectedUsers);
     }
 
     // Handle interest submit and update Firestore
@@ -188,6 +192,9 @@
           });
         });
 
+        // Save selected users to localStorage
+        localStorage.setItem("selectedUsers", JSON.stringify(selectedUsers));
+
         // Highlight selected users
         highlightSelectedUsers(selectedUsers);
 
@@ -204,15 +211,15 @@
         const checkbox = card.querySelector(".userCheckbox");
         const userName = checkbox.getAttribute("data-name");
 
-        // If the user is selected, change the background color to green
         if (selectedUsers.includes(userName)) {
-          card.classList.add("selected"); // Add green background
+          card.classList.add("selected");
+          checkbox.checked = true;
         } else {
-          card.classList.remove("selected"); // Remove green background
+          card.classList.remove("selected");
+          checkbox.checked = false;
         }
       });
     }
-
   </script>
 </head>
 <body>
