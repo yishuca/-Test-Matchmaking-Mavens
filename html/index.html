@@ -202,12 +202,6 @@
         selectedUsers.push(checkbox.getAttribute('data-name')); // Store the actual user name
       });
 
-      // Removed the check for at least one selected user
-      // if (selectedUsers.length === 0) {
-      //   alert("Please select at least one user.");
-      //   return;
-      // }
-
       try {
         const userRef = firestore.collection("users").where("name", "==", loggedInUserName);
         const userSnapshot = await userRef.get();
@@ -246,6 +240,11 @@
         }
       });
     }
+
+    // Refresh users
+    function refreshUsers() {
+      loadUsers();  // This reloads the list of users to show any new ones
+    }
   </script>
 </head>
 
@@ -267,6 +266,7 @@
       <h3>Select Users You Are Interested In</h3>
       <div id="usersList" class="users-list"></div>
       <button onclick="handleInterestSubmit()" class="button button-green">Submit Interest</button>
+      <button onclick="refreshUsers()" class="button button-green">Refresh Users</button> <!-- Refresh Button -->
     </div>
 
   </div>
