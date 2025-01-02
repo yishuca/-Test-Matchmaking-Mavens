@@ -202,10 +202,11 @@
         selectedUsers.push(checkbox.getAttribute('data-name')); // Store the actual user name
       });
 
-      if (selectedUsers.length === 0) {
-        alert("Please select at least one user.");
-        return;
-      }
+      // Removed the check for at least one selected user
+      // if (selectedUsers.length === 0) {
+      //   alert("Please select at least one user.");
+      //   return;
+      // }
 
       try {
         const userRef = firestore.collection("users").where("name", "==", loggedInUserName);
