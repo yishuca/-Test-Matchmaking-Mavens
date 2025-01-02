@@ -103,6 +103,13 @@
         width: 100%;
       }
     }
+
+    .no-users-message {
+      font-size: 16px;
+      color: #888;
+      text-align: center;
+      margin-top: 20px;
+    }
   </style>
 
   <script>
@@ -125,6 +132,7 @@
     const auth = firebase.auth();
 
     let loggedInUserName = '';
+    let lastUserList = []; // To store the list of users before refreshing
 
     // Check if the user is already logged in (using localStorage)
     window.onload = () => {
@@ -191,6 +199,17 @@
       // Reapply selected users from localStorage
       const selectedUsers = JSON.parse(localStorage.getItem("selectedUsers")) || [];
       highlightSelectedUsers(selectedUsers);
+
+      // Compare the users list and show message if no new users found
+      const noUsersMessage = document.getElementById("noUsersMessage");
+      if (users.length === 0 || (lastUserList.length === users.length && lastUserList.every((u, i) => u.name === users[i].name))) {
+        noUsersMessage.style.display = "block"; // Show no new users message
+      } else {
+        noUsersMessage.style.display = "none"; // Hide no new users message
+      }
+
+      // Save the current list of users for comparison in next refresh
+      lastUserList = users;
     }
 
     // Handle interest submit and update Firestore
@@ -267,6 +286,9 @@
       <div id="usersList" class="users-list"></div>
       <button onclick="handleInterestSubmit()" class="button button-green">Submit Interest</button>
       <button onclick="refreshUsers()" class="button button-green">Refresh Users</button> <!-- Refresh Button -->
+      <div id="noUsersMessage" class="no-users-message" style="display:none;">
+        No new users found.
+      </div>
     </div>
 
   </div>
