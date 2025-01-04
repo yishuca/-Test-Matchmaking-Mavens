@@ -47,6 +47,7 @@
       border-radius: 5px;
       font-size: 16px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
     .button-blue {
@@ -84,10 +85,7 @@
       padding: 10px;
       text-align: center;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .user-card label {
-      font-size: 18px;
+      transition: background-color 0.3s;
       cursor: pointer;
     }
 
@@ -97,7 +95,18 @@
     }
 
     .user-card input[type="checkbox"] {
+      display: inline-block; /* Keep checkbox visible */
       margin-right: 10px;
+      vertical-align: middle; /* Align checkbox with the text */
+    }
+
+    .user-card label {
+      font-size: 18px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%; /* Ensures the label takes up the whole width */
     }
 
     @media (max-width: 768px) {
@@ -122,12 +131,31 @@
     .button-container {
       display: flex;
       justify-content: space-between;
-      gap: 10px; /* space between the buttons */
+      gap: 10px;
       margin-top: 20px;
     }
 
     .button-container .button {
-      width: 48%; /* Make buttons take up equal width */
+      width: 100%;
+    }
+
+    /* Clear selection button (Make this wider) */
+    .clear-selection-button {
+        background-color: #b7b7b7;
+        width: 100%; /* Ensures the button takes the full width of the container */
+        border: none; /* Remove the border */
+    }
+
+    /* Combined Width for Clear Selection */
+    .clear-selection-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 10px; /* Adds space between button containers */
+    }
+
+    .clear-selection-container .clear-selection-button {
+      width: 100%; /* Makes the clear selection button as wide as both other buttons combined */
     }
   </style>
 
@@ -165,24 +193,32 @@
           document.getElementById("userForm").style.display = "block";
           loadUsers();
         } else {
-          // If the user name is not in Firestore, prompt them to enter it
           alert("Your name is not registered in our system. Please enter your name to continue.");
-          document.getElementById("userForm").style.display = "none"; // Hide the user form until they enter their name
-          document.getElementById("nameInput").focus(); // Focus on the name input field for easier user input
+          document.getElementById("userForm").style.display = "none";
+          document.getElementById("nameInput").focus();
         }
       }
     };
 
     // Check if a user exists in Firestore by name
     async function isUserExist(userName) {
-      const querySnapshot = await firestore.collection("users").where("name", "==", userName).get();
-      return !querySnapshot.empty; // Returns true if the user already exists
+      try {
+        const querySnapshot = await firestore.collection("users").where("name", "==", userName).get();
+        return !querySnapshot.empty;
+      } catch (e) {
+        console.error("Error checking user existence:", e);
+        alert("An error occurred while checking user existence. Please try again.");
+        return false;
+      }
     }
 
     async function handleUserSubmit() {
       const userName = document.getElementById("nameInput").value.trim();
-      if (!userName) {
-        alert("Please enter a valid name.");
+
+      // Validate name input
+      const nameRegex = /^[a-zA-Z ]{2,}$/; // Only allows alphabet characters and spaces, minimum 2 characters
+      if (!userName || !nameRegex.test(userName)) {
+        alert("Please enter a valid name with at least 2 characters (letters and spaces only).");
         return;
       }
 
@@ -230,7 +266,12 @@
         users.forEach((user) => {
           const userDiv = document.createElement("div");
           userDiv.classList.add("user-card");
-          userDiv.innerHTML = `<label><input type="checkbox" value="${user.id}" class="userCheckbox" data-name="${user.name}"> ${user.name}</label>`;
+          userDiv.innerHTML = `
+            <label>
+              <input type="checkbox" value="${user.id}" class="userCheckbox" data-name="${user.name}">
+              <span>${user.name}</span>
+            </label>
+          `;
           usersList.appendChild(userDiv);
         });
 
@@ -267,7 +308,6 @@
         selectedUsers.push(checkbox.getAttribute('data-name'));
       });
 
-      // Remove duplicates from the selected interests
       const uniqueSelectedUsers = [...new Set(selectedUsers)];
 
       try {
@@ -308,6 +348,12 @@
     function refreshUsers() {
       loadUsers();
     }
+
+    // Clear selected users
+    function clearSelections() {
+      localStorage.removeItem("selectedUsers");
+      highlightSelectedUsers([]);
+    }
   </script>
 </head>
 
@@ -315,23 +361,31 @@
 
   <div class="container">
     <h2>Enter Your Name</h2>
-    <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial" aria-label="Enter your full name">
-    <button onclick="handleUserSubmit()" class="button button-blue" aria-label="Submit your name">Submit</button>
+    <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial" aria-label="Enter your full name" required>
+    <div class="button-container">
+      <!-- Submit button now takes full width -->
+      <button onclick="handleUserSubmit()" class="button button-blue" aria-label="Submit your name" style="width: 100%;">Submit</button>
+    </div>
 
     <div id="welcomeMessage" class="welcome-message"></div>
 
     <div id="userForm" style="display:none;">
-      <h3>Select Users You Are Interested In</h3>
+      <h3>Select an interest(s)</h3>
       <div id="usersList" class="users-list"></div>
       <div id="loadingSpinner" class="loading-spinner" style="display:none;">
         <p>Loading...</p>
       </div>
       <div id="noUsersMessage" class="no-users-message" style="display:none;">
-        No new users found.
+        No other users available at the moment.
       </div>
       <div class="button-container">
-        <button onclick="handleInterestSubmit()" class="button button-green" aria-label="Submit your interests">Submit Interest</button>
+        <button onclick="handleInterestSubmit()" class="button button-green" aria-label="Submit your interests">Update Interests</button>
         <button onclick="refreshUsers()" class="button button-green" aria-label="Refresh users">Refresh Users</button>
+      </div>
+
+      <!-- Clear selection button with combined width -->
+      <div class="clear-selection-container">
+        <button onclick="clearSelections()" class="button clear-selection-button" aria-label="Clear selections" style="width: 100%;">Clear Selections</button>
       </div>
     </div>
 
