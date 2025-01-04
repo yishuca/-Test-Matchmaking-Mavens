@@ -153,17 +153,27 @@
     let loggedInUserName = '';
     let lastUserList = []; // To store the list of users before refreshing
 
-    window.onload = () => {
+    window.onload = async () => {
       const storedUserName = localStorage.getItem("loggedInUserName");
+
       if (storedUserName) {
-        loggedInUserName = storedUserName;
-        document.getElementById("welcomeMessage").innerText = `Welcome back, ${loggedInUserName}!`;
-        document.getElementById("userForm").style.display = "block";
-        loadUsers();
+        // Check if the stored user name exists in Firestore
+        const userExists = await isUserExist(storedUserName);
+        if (userExists) {
+          loggedInUserName = storedUserName;
+          document.getElementById("welcomeMessage").innerText = `Welcome back, ${loggedInUserName}!`;
+          document.getElementById("userForm").style.display = "block";
+          loadUsers();
+        } else {
+          // If the user name is not in Firestore, prompt them to enter it
+          alert("Your name is not registered in our system. Please enter your name to continue.");
+          document.getElementById("userForm").style.display = "none"; // Hide the user form until they enter their name
+          document.getElementById("nameInput").focus(); // Focus on the name input field for easier user input
+        }
       }
     };
 
-    // Check if a user already exists by name
+    // Check if a user exists in Firestore by name
     async function isUserExist(userName) {
       const querySnapshot = await firestore.collection("users").where("name", "==", userName).get();
       return !querySnapshot.empty; // Returns true if the user already exists
@@ -183,6 +193,7 @@
       }
 
       try {
+        // Add the user to the Firestore database
         const userRef = await firestore.collection("users").add({
           name: userName,
           interests: []
