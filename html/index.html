@@ -43,9 +43,7 @@
     }
 
     .button {
-      width: 100%;
       padding: 12px;
-      margin: 10px 0;
       border-radius: 5px;
       font-size: 16px;
       cursor: pointer;
@@ -98,6 +96,10 @@
       color: #006400;
     }
 
+    .user-card input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
     @media (max-width: 768px) {
       .user-card {
         width: 100%;
@@ -109,6 +111,23 @@
       color: #888;
       text-align: center;
       margin-top: 20px;
+    }
+
+    .loading-spinner {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* Flexbox container for buttons */
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px; /* space between the buttons */
+      margin-top: 20px;
+    }
+
+    .button-container .button {
+      width: 48%; /* Make buttons take up equal width */
     }
   </style>
 
@@ -134,22 +153,32 @@
     let loggedInUserName = '';
     let lastUserList = []; // To store the list of users before refreshing
 
-    // Check if the user is already logged in (using localStorage)
     window.onload = () => {
       const storedUserName = localStorage.getItem("loggedInUserName");
       if (storedUserName) {
         loggedInUserName = storedUserName;
         document.getElementById("welcomeMessage").innerText = `Welcome back, ${loggedInUserName}!`;
         document.getElementById("userForm").style.display = "block";
-        loadUsers();  // Load users to select interests
+        loadUsers();
       }
     };
 
-    // Handle user submit to Firestore
+    // Check if a user already exists by name
+    async function isUserExist(userName) {
+      const querySnapshot = await firestore.collection("users").where("name", "==", userName).get();
+      return !querySnapshot.empty; // Returns true if the user already exists
+    }
+
     async function handleUserSubmit() {
       const userName = document.getElementById("nameInput").value.trim();
       if (!userName) {
         alert("Please enter a valid name.");
+        return;
+      }
+
+      const userExists = await isUserExist(userName);
+      if (userExists) {
+        alert("A user with this name already exists. Please choose another name.");
         return;
       }
 
@@ -158,68 +187,77 @@
           name: userName,
           interests: []
         });
-        loggedInUserName = userName; // Save the logged-in user name
-        localStorage.setItem("loggedInUserName", userName);  // Remember user with localStorage
+        loggedInUserName = userName;
+        localStorage.setItem("loggedInUserName", userName);
         document.getElementById("welcomeMessage").innerText = `Welcome, ${userName}!`;
         document.getElementById("userForm").style.display = "block";
-        loadUsers();  // Load users to select interests
+        loadUsers();
       } catch (e) {
         console.error("Error adding user: ", e);
+        alert("There was an error registering your account. Please try again later.");
       }
     }
 
-    // Load users for interest selection and filter out the logged-in user
     async function loadUsers() {
-      const querySnapshot = await firestore.collection("users").get();
-      const usersList = document.getElementById("usersList");
-      usersList.innerHTML = ""; // Clear the current list
+      try {
+        showLoading(true);
+        const querySnapshot = await firestore.collection("users").get();
+        const usersList = document.getElementById("usersList");
+        usersList.innerHTML = "";
 
-      // Create an array to store the users
-      const users = [];
+        const users = [];
+        querySnapshot.forEach((doc) => {
+          const user = doc.data();
+          const userName = user.name;
+          if (userName !== loggedInUserName) {
+            users.push({ id: doc.id, name: userName });
+          }
+        });
 
-      querySnapshot.forEach((doc) => {
-        const user = doc.data();
-        const userName = user.name;
-        if (userName !== loggedInUserName) {  // Filter out the logged-in user's name
-          users.push({ id: doc.id, name: userName });
+        users.sort((a, b) => a.name.localeCompare(b.name));
+
+        users.forEach((user) => {
+          const userDiv = document.createElement("div");
+          userDiv.classList.add("user-card");
+          userDiv.innerHTML = `<label><input type="checkbox" value="${user.id}" class="userCheckbox" data-name="${user.name}"> ${user.name}</label>`;
+          usersList.appendChild(userDiv);
+        });
+
+        const selectedUsers = JSON.parse(localStorage.getItem("selectedUsers")) || [];
+        highlightSelectedUsers(selectedUsers);
+
+        const noUsersMessage = document.getElementById("noUsersMessage");
+        if (users.length === 0 || (lastUserList.length === users.length && lastUserList.every((u, i) => u.name === users[i].name))) {
+          noUsersMessage.style.display = "block";
+        } else {
+          noUsersMessage.style.display = "none";
         }
-      });
 
-      // Sort the users array alphabetically by name
-      users.sort((a, b) => a.name.localeCompare(b.name));
-
-      // Now, loop through the sorted users and create the user cards
-      users.forEach((user) => {
-        const userDiv = document.createElement("div");
-        userDiv.classList.add("user-card");
-        userDiv.innerHTML = `<label><input type="checkbox" value="${user.id}" class="userCheckbox" data-name="${user.name}"> ${user.name}</label>`;
-        usersList.appendChild(userDiv);
-      });
-
-      // Reapply selected users from localStorage
-      const selectedUsers = JSON.parse(localStorage.getItem("selectedUsers")) || [];
-      highlightSelectedUsers(selectedUsers);
-
-      // Compare the users list and show message if no new users found
-      const noUsersMessage = document.getElementById("noUsersMessage");
-      if (users.length === 0 || (lastUserList.length === users.length && lastUserList.every((u, i) => u.name === users[i].name))) {
-        noUsersMessage.style.display = "block"; // Show no new users message
-      } else {
-        noUsersMessage.style.display = "none"; // Hide no new users message
+        lastUserList = users;
+      } catch (e) {
+        console.error("Error fetching users: ", e);
+        const usersList = document.getElementById("usersList");
+        usersList.innerHTML = "<p>Unable to load users. Please try again later.</p>";
+      } finally {
+        showLoading(false);
       }
-
-      // Save the current list of users for comparison in next refresh
-      lastUserList = users;
     }
 
-    // Handle interest submit and update Firestore
+    function showLoading(isLoading) {
+      const spinner = document.getElementById("loadingSpinner");
+      spinner.style.display = isLoading ? "block" : "none";
+    }
+
     async function handleInterestSubmit() {
       const selectedUsers = [];
       const checkboxes = document.querySelectorAll(".userCheckbox:checked");
-      
+
       checkboxes.forEach((checkbox) => {
-        selectedUsers.push(checkbox.getAttribute('data-name')); // Store the actual user name
+        selectedUsers.push(checkbox.getAttribute('data-name'));
       });
+
+      // Remove duplicates from the selected interests
+      const uniqueSelectedUsers = [...new Set(selectedUsers)];
 
       try {
         const userRef = firestore.collection("users").where("name", "==", loggedInUserName);
@@ -227,25 +265,21 @@
 
         userSnapshot.forEach(async (doc) => {
           await firestore.collection("users").doc(doc.id).update({
-            interests: selectedUsers
+            interests: uniqueSelectedUsers
           });
         });
 
-        // Save selected users to localStorage
-        localStorage.setItem("selectedUsers", JSON.stringify(selectedUsers));
-
-        // Highlight selected users
-        highlightSelectedUsers(selectedUsers);
-
+        localStorage.setItem("selectedUsers", JSON.stringify(uniqueSelectedUsers));
+        highlightSelectedUsers(uniqueSelectedUsers);
       } catch (e) {
         console.error("Error handling interest: ", e);
+        alert("There was an error saving your interests. Please try again later.");
       }
     }
 
-    // Function to highlight selected users by changing their color to green
     function highlightSelectedUsers(selectedUsers) {
       const allUserCards = document.querySelectorAll(".user-card");
-      
+
       allUserCards.forEach(card => {
         const checkbox = card.querySelector(".userCheckbox");
         const userName = checkbox.getAttribute("data-name");
@@ -260,59 +294,31 @@
       });
     }
 
-    // Reset preferences and clear localStorage
-    async function resetPreferences() {
-      try {
-        const userRef = await firestore.collection("users").where("name", "==", loggedInUserName);
-        const userSnapshot = await userRef.get();
-
-        userSnapshot.forEach(async (doc) => {
-          await firestore.collection("users").doc(doc.id).update({
-            interests: [] // Reset preferences
-          });
-        });
-
-        // Clear selected users from localStorage
-        localStorage.removeItem("selectedUsers");
-
-        // Refresh the list of users
-        loadUsers();
-
-        // Optionally display a message
-        alert("Your preferences have been reset across all devices!");
-
-      } catch (e) {
-        console.error("Error resetting preferences: ", e);
-      }
-    }
-
-    // Refresh users
     function refreshUsers() {
-      loadUsers();  // This reloads the list of users to show any new ones
+      loadUsers();
     }
   </script>
 </head>
 
 <body>
 
-  <!-- Main container -->
   <div class="container">
-
-    <!-- Name Entry Form -->
     <h2>Enter Your Name</h2>
-    <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial">
-    <button onclick="handleUserSubmit()" class="button button-blue">Submit</button>
+    <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial" aria-label="Enter your full name">
+    <button onclick="handleUserSubmit()" class="button button-blue" aria-label="Submit your name">Submit</button>
 
-    <!-- Welcome Message -->
     <div id="welcomeMessage" class="welcome-message"></div>
 
-    <!-- User Interest Form -->
     <div id="userForm" style="display:none;">
       <h3>Select Users You Are Interested In</h3>
       <div id="usersList" class="users-list"></div>
-      <button onclick="handleInterestSubmit()" class="button button-green">Submit Interest</button>
-      <button onclick="refreshUsers()" class="button button-green">Refresh Users</button> <!-- Refresh Button -->
-      <button onclick="resetPreferences()" class="button button-green">Reset Preferences</button> <!-- Reset Button -->
+      <div class="button-container">
+        <button onclick="handleInterestSubmit()" class="button button-green" aria-label="Submit your interests">Submit Interest</button>
+        <button onclick="refreshUsers()" class="button button-green" aria-label="Refresh users">Refresh Users</button>
+      </div>
+      <div id="loadingSpinner" class="loading-spinner" style="display:none;">
+        <p>Loading...</p>
+      </div>
       <div id="noUsersMessage" class="no-users-message" style="display:none;">
         No new users found.
       </div>
