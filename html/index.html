@@ -260,6 +260,32 @@
       });
     }
 
+    // Reset preferences and clear localStorage
+    async function resetPreferences() {
+      try {
+        const userRef = await firestore.collection("users").where("name", "==", loggedInUserName);
+        const userSnapshot = await userRef.get();
+
+        userSnapshot.forEach(async (doc) => {
+          await firestore.collection("users").doc(doc.id).update({
+            interests: [] // Reset preferences
+          });
+        });
+
+        // Clear selected users from localStorage
+        localStorage.removeItem("selectedUsers");
+
+        // Refresh the list of users
+        loadUsers();
+
+        // Optionally display a message
+        alert("Your preferences have been reset across all devices!");
+
+      } catch (e) {
+        console.error("Error resetting preferences: ", e);
+      }
+    }
+
     // Refresh users
     function refreshUsers() {
       loadUsers();  // This reloads the list of users to show any new ones
@@ -286,6 +312,7 @@
       <div id="usersList" class="users-list"></div>
       <button onclick="handleInterestSubmit()" class="button button-green">Submit Interest</button>
       <button onclick="refreshUsers()" class="button button-green">Refresh Users</button> <!-- Refresh Button -->
+      <button onclick="resetPreferences()" class="button button-green">Reset Preferences</button> <!-- Reset Button -->
       <div id="noUsersMessage" class="no-users-message" style="display:none;">
         No new users found.
       </div>
