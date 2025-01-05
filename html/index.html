@@ -385,6 +385,82 @@
       localStorage.removeItem("selectedUsers");
       highlightSelectedUsers([]);
     }
+
+    let allUsers = []; // Store all users to be used for filtering
+
+async function loadUsers() {
+  try {
+    showLoading(true);
+    const querySnapshot = await firestore.collection("users").get();
+    const usersList = document.getElementById("usersList");
+    usersList.innerHTML = "";
+
+    allUsers = []; // Reset the users list
+    querySnapshot.forEach((doc) => {
+      const user = doc.data();
+      const userName = user.name;
+      if (userName !== loggedInUserName) {
+        allUsers.push({ id: doc.id, name: userName });
+      }
+    });
+
+    allUsers.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Initially display all users
+    displayUsers(allUsers);
+
+    const selectedUsers = JSON.parse(localStorage.getItem("selectedUsers")) || [];
+    highlightSelectedUsers(selectedUsers);
+
+    const noUsersMessage = document.getElementById("noUsersMessage");
+    if (allUsers.length === 0 || (lastUserList.length === allUsers.length && lastUserList.every((u, i) => u.name === allUsers[i].name))) {
+      noUsersMessage.style.display = "block";
+    } else {
+      noUsersMessage.style.display = "none";
+    }
+
+    lastUserList = allUsers;
+  } catch (e) {
+    console.error("Error fetching users: ", e);
+    const usersList = document.getElementById("usersList");
+    usersList.innerHTML = "<p>Unable to load users. Please try again later.</p>";
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Function to filter and display users based on search input
+function filterUsers() {
+  const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+  const filteredUsers = allUsers.filter(user => user.name.toLowerCase().includes(searchQuery));
+  displayUsers(filteredUsers);
+}
+
+// Function to display users
+function displayUsers(users) {
+  const usersList = document.getElementById("usersList");
+  usersList.innerHTML = ""; // Clear current user list
+
+  if (users.length === 0) {
+    const noResultsMessage = document.createElement("div");
+    noResultsMessage.classList.add("no-users-message");
+    noResultsMessage.textContent = "No users found.";
+    usersList.appendChild(noResultsMessage);
+  } else {
+    users.forEach((user) => {
+      const userDiv = document.createElement("div");
+      userDiv.classList.add("user-card");
+      userDiv.innerHTML = `
+        <label>
+          <input type="checkbox" value="${user.id}" class="userCheckbox" data-name="${user.name}">
+          <span>${user.name}</span>
+        </label>
+      `;
+      usersList.appendChild(userDiv);
+    });
+  }
+}
+
   </script>
 </head>
 
@@ -400,6 +476,8 @@
     <div id="welcomeMessage" class="welcome-message"></div>
 
     <div id="userForm" style="display:none;">
+      <input type="text" id="searchInput" class="w3-input w3-border w3-margin-bottom" placeholder="Search users..." oninput="filterUsers()">
+
       <h3>Select an interest(s)</h3>
       <div id="usersList" class="users-list"></div>
       <div id="loadingSpinner" class="loading-spinner" style="display:none;">
