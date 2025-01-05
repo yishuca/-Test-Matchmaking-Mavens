@@ -95,9 +95,9 @@
     }
 
     .user-card input[type="checkbox"] {
-      display: inline-block; /* Keep checkbox visible */
+      display: inline-block;
       margin-right: 10px;
-      vertical-align: middle; /* Align checkbox with the text */
+      vertical-align: middle;
     }
 
     .user-card label {
@@ -106,7 +106,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: flex-start;
-      width: 100%; /* Ensures the label takes up the whole width */
+      width: 100%;
     }
 
     @media (max-width: 768px) {
@@ -122,9 +122,25 @@
       margin-top: 20px;
     }
 
+    /* Loading Spinner Styles */
     .loading-spinner {
       text-align: center;
       margin-top: 20px;
+      display: none;
+    }
+
+    .loading-spinner .spinner {
+      border: 4px solid #f3f3f3; /* Light gray */
+      border-top: 4px solid #3498db; /* Blue color */
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     /* Flexbox container for buttons */
@@ -141,21 +157,29 @@
 
     /* Clear selection button (Make this wider) */
     .clear-selection-button {
-        background-color: #b7b7b7;
-        width: 100%; /* Ensures the button takes the full width of the container */
-        border: none; /* Remove the border */
+      background-color: #b7b7b7;
+      width: 100%;
+      border: none;
     }
 
-    /* Combined Width for Clear Selection */
     .clear-selection-container {
       display: flex;
       justify-content: space-between;
       width: 100%;
-      margin-top: 10px; /* Adds space between button containers */
+      margin-top: 10px;
     }
 
     .clear-selection-container .clear-selection-button {
-      width: 100%; /* Makes the clear selection button as wide as both other buttons combined */
+      width: 100%;
+    }
+
+    /* User selection feedback */
+    .selection-feedback {
+      text-align: center;
+      font-size: 16px;
+      margin-top: 15px;
+      color: #4CAF50;
+      display: none;
     }
   </style>
 
@@ -200,7 +224,6 @@
       }
     };
 
-    // Check if a user exists in Firestore by name
     async function isUserExist(userName) {
       try {
         const querySnapshot = await firestore.collection("users").where("name", "==", userName).get();
@@ -215,8 +238,7 @@
     async function handleUserSubmit() {
       const userName = document.getElementById("nameInput").value.trim();
 
-      // Validate name input
-      const nameRegex = /^[a-zA-Z ]{2,}$/; // Only allows alphabet characters and spaces, minimum 2 characters
+      const nameRegex = /^[a-zA-Z ]{2,}$/;
       if (!userName || !nameRegex.test(userName)) {
         alert("Please enter a valid name with at least 2 characters (letters and spaces only).");
         return;
@@ -229,7 +251,6 @@
       }
 
       try {
-        // Add the user to the Firestore database
         const userRef = await firestore.collection("users").add({
           name: userName,
           interests: []
@@ -322,6 +343,8 @@
 
         localStorage.setItem("selectedUsers", JSON.stringify(uniqueSelectedUsers));
         highlightSelectedUsers(uniqueSelectedUsers);
+
+        showSelectionFeedback(`Your interests have been updated!`);
       } catch (e) {
         console.error("Error handling interest: ", e);
         alert("There was an error saving your interests. Please try again later.");
@@ -345,11 +368,19 @@
       });
     }
 
+    function showSelectionFeedback(message) {
+      const feedbackElement = document.getElementById("selectionFeedback");
+      feedbackElement.innerText = message;
+      feedbackElement.style.display = "block";
+      setTimeout(() => {
+        feedbackElement.style.display = "none";
+      }, 3000);
+    }
+
     function refreshUsers() {
       loadUsers();
     }
 
-    // Clear selected users
     function clearSelections() {
       localStorage.removeItem("selectedUsers");
       highlightSelectedUsers([]);
@@ -363,7 +394,6 @@
     <h2>Enter Your Name</h2>
     <input type="text" id="nameInput" class="w3-input w3-border w3-margin-bottom" placeholder="First Name and Last Initial" aria-label="Enter your full name" required>
     <div class="button-container">
-      <!-- Submit button now takes full width -->
       <button onclick="handleUserSubmit()" class="button button-blue" aria-label="Submit your name" style="width: 100%;">Submit</button>
     </div>
 
@@ -373,22 +403,21 @@
       <h3>Select an interest(s)</h3>
       <div id="usersList" class="users-list"></div>
       <div id="loadingSpinner" class="loading-spinner" style="display:none;">
-        <p>Loading...</p>
+        <div class="spinner"></div>
       </div>
-      <div id="noUsersMessage" class="no-users-message" style="display:none;">
-        No other users available at the moment.
-      </div>
+      <div id="noUsersMessage" class="no-users-message">No users available.</div>
+      <div id="selectionFeedback" class="selection-feedback"></div>
+
       <div class="button-container">
-        <button onclick="handleInterestSubmit()" class="button button-green" aria-label="Submit your interests">Update Interests</button>
-        <button onclick="refreshUsers()" class="button button-green" aria-label="Refresh users">Refresh Users</button>
+        <button onclick="handleInterestSubmit()" class="button button-blue">Save Interests</button>
+        <button onclick="refreshUsers()" class="button button-green">Refresh Users</button>
       </div>
 
-      <!-- Clear selection button with combined width -->
       <div class="clear-selection-container">
-        <button onclick="clearSelections()" class="button clear-selection-button" aria-label="Clear selections" style="width: 100%;">Clear Selections</button>
+        <button onclick="clearSelections()" class="button button-green clear-selection-button" aria-label="Clear all selections">Clear Selections</button>
       </div>
-    </div>
 
+    </div>
   </div>
 
 </body>
