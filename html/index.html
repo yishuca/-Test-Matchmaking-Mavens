@@ -476,16 +476,14 @@ function displayUsers(users) {
     <div id="welcomeMessage" class="welcome-message"></div>
 
     <div id="userForm" style="display:none;">
-      <input type="text" id="searchInput" class="w3-input w3-border w3-margin-bottom" placeholder="Search users..." oninput="filterUsers()">
-
       <h3>Select an interest(s)</h3>
       <div id="usersList" class="users-list"></div>
       <div id="loadingSpinner" class="loading-spinner" style="display:none;">
         <div class="spinner"></div>
       </div>
-      <div id="noUsersMessage" class="no-users-message">No users available.</div>
-      <div id="selectionFeedback" class="selection-feedback"></div>
-
+      <div id="noUsersMessage" class="no-users-message">No other users available yet.</div><br>
+      <div id="selectionFeedback" class="selection-feedback"></div><br>
+      <input type="text" id="searchInput" class="w3-input w3-border w3-margin-bottom" placeholder="Search users..." oninput="filterUsers()">
       <div class="button-container">
         <button onclick="handleInterestSubmit()" class="button button-blue">Save Interests</button>
         <button onclick="refreshUsers()" class="button button-green">Refresh Users</button>
