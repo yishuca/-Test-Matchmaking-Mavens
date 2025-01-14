@@ -73,7 +73,7 @@ signinForm.addEventListener('submit', function (event) {
         .then((userCredential) => {
             console.log('You are now signed in!', userCredential.user);
             alert('You are now signed in!');
-            window.location.href = '/dashboard.html'; // Redirect to dashboard
+            window.location.href = 'dashboard.html'; // Redirect to dashboard
         })
         .catch((error) => {
             console.error('Sign-in error:', error.message);
@@ -161,7 +161,7 @@ createAccountForm.addEventListener('submit', function (event) {
         })
         .then(() => {
             alert('Account created successfully!');
-            window.location.href = '/dashboard.html'; // Example redirection after successful sign up
+            window.location.href = 'dashboard.html'; // Example redirection after successful sign up
         })
         .catch((error) => {
             console.error('Account creation error:', error.message);
