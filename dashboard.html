@@ -50,7 +50,7 @@
                     userNameDisplay.textContent = `${user.email}`;
                 }
             } else {
-                window.location.href = '/index.html';
+                window.location.href = '/-Test-Matchmaking-Mavens/index.html';
             }
         });
 
@@ -59,7 +59,7 @@
             const confirmLogout = confirm("Are you sure you want to log out?");
             if (confirmLogout) {
                 signOut(auth).then(() => {
-                    window.location.href = '/index.html';
+                    window.location.href = '/-Test-Matchmaking-Mavens/index.html';
                 }).catch((error) => {
                     console.error('Error signing out:', error.message);
                 });
@@ -91,7 +91,7 @@
 
         // Add event listener to the button for matchmaking
         document.getElementById('enterMatchmaking').addEventListener('click', function() {
-            fadeOutAndRedirect('/-Test-Matchmaking-Mavens/matchmakingevent/index.html');
+            fadeOutAndRedirect('/-Test-Matchmaking-Mavens/matchmakingevent.html');
         });
 
         // Mobile hamburger menu toggle
@@ -121,7 +121,7 @@
             onAuthStateChanged(auth, (user) => {
                 loadingSpinner.style.display = 'none'; // Hide spinner after checking auth state
                 if (!user) {
-                    window.location.href = '/index.html';
+                    window.location.href = '/-Test-Matchmaking-Mavens/index.html';
                 }
             });
     </script>
