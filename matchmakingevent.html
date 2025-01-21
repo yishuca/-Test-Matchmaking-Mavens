@@ -31,6 +31,20 @@
         const usersListElement = document.getElementById('usersList');
         const userNameDisplay = document.getElementById('userName');
         const refreshBtn = document.getElementById('refreshBtn');  // Refresh button
+        const loadingOverlay = document.getElementById('loadingOverlay'); // The overlay element
+
+        // Track selected names
+        let selectedNames = [];
+
+        // Function to show the spinner with overlay
+        function showSpinner() {
+            loadingOverlay.style.display = 'flex';
+        }
+
+        // Function to hide the spinner and overlay
+        function hideSpinner() {
+            loadingOverlay.style.display = 'none';
+        }
 
         // Function to add the user's name to Firestore
         async function addUserToList() {
@@ -83,21 +97,148 @@
             }
         }
 
-        // Function to display the list of users
         async function getUsersList() {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'usersList'));
-                usersListElement.innerHTML = ''; // Clear the current list
+  showSpinner(); // Show the spinner while data is being fetched
+  try {
+    const querySnapshot = await getDocs(collection(db, 'usersList'));
+    usersListElement.innerHTML = ''; // Clear the current list
+    const currentUser = auth.currentUser; // Get the currently authenticated user
 
-                // Loop through the documents in the 'usersList' collection
-                querySnapshot.forEach((doc) => {
-                    const userName = doc.data().name; // Get the user's name from Firestore document
-                    const li = document.createElement('li');
-                    li.textContent = userName; // Add the name to the list item
-                    usersListElement.appendChild(li); // Append the list item to the <ul> element
-                });
-            } catch (error) {
-                console.error('Error fetching users list:', error);
+    // Extract user names and sort them alphabetically
+    const users = [];
+    querySnapshot.forEach((doc) => {
+      users.push(doc.data().name); // Collect user names
+    });
+
+    users.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())); // Sort names alphabetically, case-insensitively
+
+    // Populate the sorted list
+    users.forEach((userName) => {
+      const nameParts = userName.split(' '); // Split the name into parts
+      const firstName = capitalizeFirstLetter(nameParts[0]); // Capitalize first name
+      const lastNameInitial = nameParts.length > 1 ? capitalizeFirstLetter(nameParts[1].charAt(0)) : ''; // Capitalize first initial of the last name
+
+      // Create a display name with first name and last initial
+      const displayName = `${firstName} ${lastNameInitial}`;
+
+      const li = document.createElement('li');
+      li.textContent = displayName; // Add the formatted name to the list item
+
+      // Create a div for the status message
+      const statusMessageDiv = document.createElement('div');
+      statusMessageDiv.classList.add('statusMessage'); // Add a class for styling
+      li.appendChild(statusMessageDiv);
+
+      // Check if the name is the current user's name
+      if (currentUser && userName === (currentUser.displayName || currentUser.email)) {
+        li.style.backgroundColor = '#222'; // Different color for the current user's name
+        li.style.cursor = 'default'; // Disable pointer cursor
+      } else {
+        // Check if the name is saved (i.e., exists in 'savedInterests')
+        if (selectedNames.includes(displayName)) {
+          li.style.backgroundColor = 'darkgreen'; // Apply dark green color for saved interests
+          statusMessageDiv.textContent = 'Interest Selected!';
+          statusMessageDiv.style.color = 'green';
+          statusMessageDiv.style.display = 'inline'; // Show the message if saved
+        } else {
+          li.style.backgroundColor = '#333'; // Default color
+        }
+
+        // Click event to save or unsave interest
+        li.addEventListener('click', async () => {
+          if (li.style.backgroundColor === 'darkgreen') {
+            // If the name is saved (green), unsave it
+            await unsaveInterest(displayName);
+            li.style.backgroundColor = '#333'; // Reset to default color
+            selectedNames = selectedNames.filter((name) => name !== displayName); // Remove from selected names
+            statusMessageDiv.textContent = 'Unselected!';
+            statusMessageDiv.style.color = '#d3d3d3'; // Change color to light grey
+          } else {
+            // If the name is not saved, save it
+            await saveInterest(displayName);
+            li.style.backgroundColor = 'darkgreen'; // Change to dark green
+            selectedNames.push(displayName); // Add to selected names
+            statusMessageDiv.textContent = 'Selected!';
+            statusMessageDiv.style.color = 'green';
+          }
+          statusMessageDiv.style.display = 'inline'; // Show the message immediately
+          statusMessageDiv.style.opacity = '1'; // Ensure it's fully visible when clicked
+
+          // Fade out the status message after 3 seconds
+          setTimeout(() => {
+            statusMessageDiv.style.opacity = '0';
+          }, 3000);
+
+          // Reset opacity after fadeout
+          setTimeout(() => {
+            statusMessageDiv.style.display = 'none';
+            statusMessageDiv.style.opacity = '1';
+          }, 3500);
+        });
+      }
+
+      usersListElement.appendChild(li); // Append the list item to the <ul> element
+    });
+  } catch (error) {
+    console.error('Error fetching users list:', error);
+  }
+  hideSpinner(); // Hide the spinner once data is loaded
+}
+
+
+        // Function to capitalize the first letter of a string
+        function capitalizeFirstLetter(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
+
+        // Function to save user's interest (add to Firestore)
+        async function saveInterest(userName) {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    // Add name to Firestore if not already present
+                    const nameQuery = query(
+                        collection(db, 'savedInterests'),
+                        where("name", "==", userName),
+                        where("userEmail", "==", user.email)
+                    );
+                    const querySnapshot = await getDocs(nameQuery);
+
+                    if (querySnapshot.empty) {
+                        await addDoc(collection(db, 'savedInterests'), {
+                            name: userName,
+                            userEmail: user.email,
+                            timestamp: new Date()
+                        });
+                        console.log(`Name "${userName}" saved to Firestore.`);
+                    }
+                } catch (error) {
+                    console.error('Error saving name to Firestore:', error);
+                }
+            }
+        }
+
+        // Function to unsave user's interest (remove from Firestore)
+        async function unsaveInterest(userName) {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    // Query to find the saved interest
+                    const nameQuery = query(
+                        collection(db, 'savedInterests'),
+                        where("name", "==", userName),
+                        where("userEmail", "==", user.email)
+                    );
+                    const querySnapshot = await getDocs(nameQuery);
+
+                    if (!querySnapshot.empty) {
+                        // If the name exists in savedInterests, remove it
+                        await deleteDoc(doc(db, 'savedInterests', querySnapshot.docs[0].id));
+                        console.log(`Name "${userName}" removed from Firestore.`);
+                    }
+                } catch (error) {
+                    console.error('Error removing name from Firestore:', error);
+                }
             }
         }
 
@@ -119,6 +260,24 @@
             }
         }
 
+        // Load saved interests (selected names) for the logged-in user
+        async function loadSavedInterests() {
+            const user = auth.currentUser;
+            if (user) {
+                const savedInterestsQuery = query(
+                    collection(db, 'savedInterests'),
+                    where("userEmail", "==", user.email)
+                );
+                const querySnapshot = await getDocs(savedInterestsQuery);
+
+                selectedNames = []; // Clear previous selections
+                querySnapshot.forEach((doc) => {
+                    selectedNames.push(doc.data().name); // Add names to the selectedNames array
+                });
+                console.log('Loaded saved interests:', selectedNames);
+            }
+        }
+
         // Initially populate the list when the page loads and check if user is already in the list
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -127,6 +286,9 @@
 
                 // Check if the user is already in the list
                 await checkIfUserJoined();
+
+                // Load the saved interests (selected names)
+                await loadSavedInterests();
 
                 // Refresh the list of users
                 getUsersList();
@@ -160,6 +322,7 @@
             color: #1d1d1d;
             margin: 0;
             transition: all 0.3s ease;
+            position: relative; /* Ensure body can hold the overlay */
         }
 
         /* Button and List Styling */
@@ -181,6 +344,7 @@
         #usersList {
             list-style-type: none;
             padding: 0;
+            margin-bottom: 30px; /* Add space between the list and the buttons */
         }
 
         #usersList li {
@@ -189,6 +353,24 @@
             padding: 10px;
             margin: 5px 0;
             border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        #usersList li:hover {
+            background-color: #444;
+        }
+
+        .statusMessage {
+            font-size: 12px;
+            position: absolute;
+            left: -170px;  /* Move the message further left */
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 1s ease-out;  /* Smooth fade-out */
+            color: #ff4b4b;
+            margin-left: 90px;  /* Space between message and name */
         }
 
         .content {
@@ -213,6 +395,35 @@
             margin-bottom: 40px;
             text-align: center;
         }
+
+        /* Loading Spinner Overlay */
+        #loadingOverlay {
+            display: none; /* Initially hidden */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999; /* Ensure it's on top of other elements */
+        }
+
+        #loadingSpinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -226,6 +437,11 @@
         <button id="joinListBtn">Join the List</button>
         <button id="leaveListBtn" style="display:none;">Leave the List</button> <!-- Initially hidden -->
         <button id="refreshBtn">Refresh List</button> <!-- Refresh button -->
+
+        <!-- Loading Overlay and Spinner -->
+        <div id="loadingOverlay">
+            <div id="loadingSpinner"></div>
+        </div>
     </div>
 </body>
 </html>
