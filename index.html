@@ -247,6 +247,27 @@
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
 
+    // Function to render the profile card
+    function renderProfileCard(user, userData) {
+      return `
+        <div class="profile-card">
+          <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
+          <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
+          <p class="email">${userData?.email || "No email"}</p>
+          <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
+          <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
+          <div id="edit-profile" style="display: none;">
+            <input type="text" id="edit-first-name" placeholder="First Name" value="${userData?.firstName || ""}">
+            <input type="text" id="edit-last-name" placeholder="Last Name" value="${userData?.lastName || ""}">
+            <input type="text" id="edit-phone-number" placeholder="Phone Number" value="${userData?.phoneNumber || ""}" maxlength="10">
+            <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
+            <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
+          </div>
+          <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
+        </div>
+      `;
+    }
+
     // Sign in with Google
     async function signInWithGoogle() {
       try {
@@ -283,41 +304,8 @@
         // Update the profile page content
         const profileContent = document.getElementById('profile-content');
         if (profileContent) {
-          profileContent.innerHTML = `
-            <div class="profile-card">
-              <img src="${user.photoURL}" alt="Profile Picture">
-              <h2 id="profile-name">${userProfile?.firstName || "Unknown"} ${userProfile?.lastName || ""}</h2>
-              <p class="email">${user.email}</p>
-              <p class="phone-number">${userProfile?.phoneNumber || "No phone number"}</p>
-              <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
-              <div id="edit-profile" style="display: none;">
-                <input type="text" id="edit-first-name" placeholder="First Name" value="${userProfile?.firstName || ""}">
-                <input type="text" id="edit-last-name" placeholder="Last Name" value="${userProfile?.lastName || ""}">
-                <input type="text" id="edit-phone-number" placeholder="Phone Number" value="${userProfile?.phoneNumber || ""}" maxlength="10">
-                <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
-                <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
-              </div>
-              <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
-            </div>
-          `;
-
-          // Add input validation for the phone number field
-          const phoneInput = document.getElementById('edit-phone-number');
-          if (phoneInput) {
-            phoneInput.addEventListener('input', function () {
-              // Remove non-numeric characters
-              this.value = this.value.replace(/\D/g, '');
-
-              // Validate length
-              if (this.value.length !== 10) {
-                this.classList.add('error');
-                document.getElementById('phone-error').style.display = 'block';
-              } else {
-                this.classList.remove('error');
-                document.getElementById('phone-error').style.display = 'none';
-              }
-            });
-          }
+          profileContent.innerHTML = renderProfileCard(user, userProfile);
+          setupPhoneNumberValidation();
         }
 
         // Automatically navigate to the Profile page after sign-in
@@ -390,41 +378,8 @@
         }
 
         if (profileContent) {
-          profileContent.innerHTML = `
-            <div class="profile-card">
-              <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
-              <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
-              <p class="email">${userData?.email || "No email"}</p>
-              <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
-              <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
-              <div id="edit-profile" style="display: none;">
-                <input type="text" id="edit-first-name" placeholder="First Name" value="${userData?.firstName || ""}">
-                <input type="text" id="edit-last-name" placeholder="Last Name" value="${userData?.lastName || ""}">
-                <input type="text" id="edit-phone-number" placeholder="Phone Number" value="${userData?.phoneNumber || ""}" maxlength="10">
-                <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
-                <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
-              </div>
-              <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
-            </div>
-          `;
-
-          // Add input validation for the phone number field
-          const phoneInput = document.getElementById('edit-phone-number');
-          if (phoneInput) {
-            phoneInput.addEventListener('input', function () {
-              // Remove non-numeric characters
-              this.value = this.value.replace(/\D/g, '');
-
-              // Validate length
-              if (this.value.length !== 10) {
-                this.classList.add('error');
-                document.getElementById('phone-error').style.display = 'block';
-              } else {
-                this.classList.remove('error');
-                document.getElementById('phone-error').style.display = 'none';
-              }
-            });
-          }
+          profileContent.innerHTML = renderProfileCard(user, userData);
+          setupPhoneNumberValidation();
         }
 
         if (matchesContent) {
@@ -451,6 +406,26 @@
         }
       }
     });
+
+    // Function to set up phone number validation
+    function setupPhoneNumberValidation() {
+      const phoneInput = document.getElementById('edit-phone-number');
+      if (phoneInput) {
+        phoneInput.addEventListener('input', function () {
+          // Remove non-numeric characters
+          this.value = this.value.replace(/\D/g, '');
+
+          // Validate length
+          if (this.value.length !== 10) {
+            this.classList.add('error');
+            document.getElementById('phone-error').style.display = 'block';
+          } else {
+            this.classList.remove('error');
+            document.getElementById('phone-error').style.display = 'none';
+          }
+        });
+      }
+    }
   </script>
 
   <!-- Global Navigation Script -->
