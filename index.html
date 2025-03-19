@@ -121,6 +121,10 @@
       font-size: 14px;
       color: #808080; /* Gray text */
     }
+    .profile-card .phone-number {
+      font-size: 14px;
+      color: #808080; /* Gray text */
+    }
     .profile-card .sign-out-button {
       background-color: #ff4d4d; /* Red for sign-out button */
       color: white;
@@ -160,6 +164,14 @@
       background-color: #1f1f1f;
       color: #ffffff;
       font-size: 16px; /* Match font size with buttons */
+    }
+    .profile-card input.error {
+      border-color: #ff4d4d; /* Red border for invalid input */
+    }
+    .profile-card .error-message {
+      color: #ff4d4d; /* Red text for error messages */
+      font-size: 14px;
+      margin-top: 5px;
     }
     #current-date {
       font-size: 20px;
@@ -276,15 +288,36 @@
               <img src="${user.photoURL}" alt="Profile Picture">
               <h2 id="profile-name">${userProfile?.firstName || "Unknown"} ${userProfile?.lastName || ""}</h2>
               <p class="email">${user.email}</p>
+              <p class="phone-number">${userProfile?.phoneNumber || "No phone number"}</p>
               <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
               <div id="edit-profile" style="display: none;">
                 <input type="text" id="edit-first-name" placeholder="First Name" value="${userProfile?.firstName || ""}">
                 <input type="text" id="edit-last-name" placeholder="Last Name" value="${userProfile?.lastName || ""}">
+                <input type="text" id="edit-phone-number" placeholder="Phone Number" value="${userProfile?.phoneNumber || ""}" maxlength="10">
+                <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
                 <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
               </div>
               <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
             </div>
           `;
+
+          // Add input validation for the phone number field
+          const phoneInput = document.getElementById('edit-phone-number');
+          if (phoneInput) {
+            phoneInput.addEventListener('input', function () {
+              // Remove non-numeric characters
+              this.value = this.value.replace(/\D/g, '');
+
+              // Validate length
+              if (this.value.length !== 10) {
+                this.classList.add('error');
+                document.getElementById('phone-error').style.display = 'block';
+              } else {
+                this.classList.remove('error');
+                document.getElementById('phone-error').style.display = 'none';
+              }
+            });
+          }
         }
 
         // Automatically navigate to the Profile page after sign-in
@@ -316,14 +349,18 @@
       }
     }
 
-    // Function to update user's first and last name in Firestore
-    async function updateUserProfile(uid, firstName, lastName) {
+    // Function to update user's profile in Firestore
+    async function updateUserProfile(uid, firstName, lastName, phoneNumber) {
       try {
         // Capitalize the first letter of first and last names
         const capitalizedFirstName = capitalizeFirstLetter(firstName);
         const capitalizedLastName = capitalizeFirstLetter(lastName);
 
-        await setDoc(doc(db, "users", uid), { firstName: capitalizedFirstName, lastName: capitalizedLastName }, { merge: true });
+        await setDoc(doc(db, "users", uid), {
+          firstName: capitalizedFirstName,
+          lastName: capitalizedLastName,
+          phoneNumber: phoneNumber || null, // Save phone number (or null if empty)
+        }, { merge: true });
         console.log("Profile updated successfully!");
       } catch (error) {
         console.error("Error updating profile:", error);
@@ -358,15 +395,36 @@
               <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
               <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
               <p class="email">${userData?.email || "No email"}</p>
+              <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
               <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
               <div id="edit-profile" style="display: none;">
                 <input type="text" id="edit-first-name" placeholder="First Name" value="${userData?.firstName || ""}">
                 <input type="text" id="edit-last-name" placeholder="Last Name" value="${userData?.lastName || ""}">
+                <input type="text" id="edit-phone-number" placeholder="Phone Number" value="${userData?.phoneNumber || ""}" maxlength="10">
+                <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
                 <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
               </div>
               <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
             </div>
           `;
+
+          // Add input validation for the phone number field
+          const phoneInput = document.getElementById('edit-phone-number');
+          if (phoneInput) {
+            phoneInput.addEventListener('input', function () {
+              // Remove non-numeric characters
+              this.value = this.value.replace(/\D/g, '');
+
+              // Validate length
+              if (this.value.length !== 10) {
+                this.classList.add('error');
+                document.getElementById('phone-error').style.display = 'block';
+              } else {
+                this.classList.remove('error');
+                document.getElementById('phone-error').style.display = 'none';
+              }
+            });
+          }
         }
 
         if (matchesContent) {
@@ -463,19 +521,34 @@
     async function saveProfile(uid) {
       const firstName = document.getElementById('edit-first-name').value.trim();
       const lastName = document.getElementById('edit-last-name').value.trim();
+      const phoneNumber = document.getElementById('edit-phone-number').value.trim();
 
       if (!firstName || !lastName) {
         alert("Please fill in both first and last name.");
         return;
       }
 
+      // Validate phone number
+      const phoneInput = document.getElementById('edit-phone-number');
+      if (phoneNumber.length !== 10 || !/^\d+$/.test(phoneNumber)) {
+        phoneInput.classList.add('error');
+        document.getElementById('phone-error').style.display = 'block';
+        return;
+      }
+
       try {
-        await updateUserProfile(uid, firstName, lastName);
+        await updateUserProfile(uid, firstName, lastName, phoneNumber);
 
         // Update the displayed name
         const profileName = document.getElementById('profile-name');
         if (profileName) {
           profileName.innerText = `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`;
+        }
+
+        // Update the displayed phone number
+        const phoneNumberElement = document.querySelector('.phone-number');
+        if (phoneNumberElement) {
+          phoneNumberElement.innerText = phoneNumber || "No phone number";
         }
 
         // Hide the edit form
