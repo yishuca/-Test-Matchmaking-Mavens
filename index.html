@@ -107,6 +107,11 @@
       border-radius: 50%;
       margin-bottom: 15px;
       border: 3px solid #00bcd4; /* Teal accent */
+      cursor: pointer; /* Make the image clickable */
+      transition: transform 0.3s ease;
+    }
+    .profile-card img:hover {
+      transform: scale(1.1); /* Add a hover effect */
     }
     .profile-card h2 {
       margin: 10px 0;
@@ -218,7 +223,7 @@
   <script type="module">
     // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
     // Firebase configuration
@@ -251,7 +256,7 @@
     function renderProfileCard(user, userData) {
       return `
         <div class="profile-card">
-          <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
+          <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture" onclick="redirectToGoogleProfile()">
           <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
           <p class="email">${userData?.email || "No email"}</p>
           <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
@@ -266,6 +271,38 @@
           <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
         </div>
       `;
+    }
+
+    // Redirect to Google's "Personal Info" page
+    function redirectToGoogleProfile() {
+      window.open("https://myaccount.google.com/personal-info", "_blank");
+    }
+
+    // Function to reload the user's profile data from Google
+    async function reloadUserProfile() {
+      const user = auth.currentUser;
+      if (user) {
+        // Force refresh the user's ID token to get the latest profile data
+        await user.reload();
+        const updatedUser = auth.currentUser;
+
+        // Update Firestore with the latest profile data
+        const userData = {
+          uid: updatedUser.uid,
+          email: updatedUser.email,
+          photoURL: updatedUser.photoURL,
+          firstName: updatedUser.displayName?.split(" ")[0] || "Unknown",
+          lastName: updatedUser.displayName?.split(" ")[1] || "",
+        };
+
+        await setDoc(doc(db, "users", updatedUser.uid), userData, { merge: true });
+
+        // Update the UI with the latest profile data
+        const profileContent = document.getElementById('profile-content');
+        if (profileContent) {
+          profileContent.innerHTML = renderProfileCard(updatedUser, userData);
+        }
+      }
     }
 
     // Sign in with Google
@@ -285,6 +322,8 @@
           uid: user.uid,
           email: user.email,
           photoURL: user.photoURL,
+          firstName: user.displayName?.split(" ")[0] || "Unknown",
+          lastName: user.displayName?.split(" ")[1] || "",
           createdAt: new Date().toISOString(),
         };
 
@@ -359,9 +398,11 @@
     window.signInWithGoogle = signInWithGoogle;
     window.signOutUser = signOutUser;
     window.updateUserProfile = updateUserProfile;
+    window.redirectToGoogleProfile = redirectToGoogleProfile;
+    window.reloadUserProfile = reloadUserProfile;
 
     // Auto sign-in if already authenticated
-    auth.onAuthStateChanged(async (user) => {
+    onAuthStateChanged(auth, async (user) => {
       console.log("Auth state changed. User:", user);
 
       const userInfo = document.getElementById('user-info');
