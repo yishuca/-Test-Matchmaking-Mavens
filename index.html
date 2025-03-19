@@ -136,6 +136,30 @@
     .profile-card .sign-out-button:hover {
       background-color: #e60000; /* Darker red on hover */
     }
+    .profile-card .edit-button {
+      background-color: #00bcd4; /* Teal for edit button */
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+    .profile-card .edit-button:hover {
+      background-color: #0097a7; /* Darker teal on hover */
+    }
+    .profile-card input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #00bcd4;
+      border-radius: 5px;
+      background-color: #1f1f1f;
+      color: #ffffff;
+    }
     #current-date {
       font-size: 20px;
       color: #00bcd4; /* Teal accent */
@@ -205,47 +229,74 @@
     // Google Authentication
     const provider = new GoogleAuthProvider();
 
+    // Utility function to capitalize the first letter of a string
+    function capitalizeFirstLetter(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+
     // Sign in with Google
     async function signInWithGoogle() {
       try {
+        const signInButton = document.getElementById('sign-in-button');
+        if (signInButton) {
+          signInButton.disabled = true;
+          signInButton.innerText = "Signing in...";
+        }
+
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-
-        // Extract first and last name from displayName
-        const displayName = user.displayName || "";
-        const names = displayName.split(" ");
-        const firstName = names[0] || "Unknown";
-        const lastName = names.slice(1).join(" ") || "Unknown"; // Handle cases with no last name
 
         // Prepare user data for Firestore
         const userData = {
           uid: user.uid,
           email: user.email,
-          firstName: firstName,
-          lastName: lastName,
           photoURL: user.photoURL,
           createdAt: new Date().toISOString(),
         };
 
-        // Log user data before saving to Firestore
-        console.log("User data to save:", userData);
-
         // Store user data in Firestore
         await setDoc(doc(db, "users", user.uid), userData, { merge: true });
 
-        // Log success message
-        console.log("User data saved to Firestore successfully!");
+        // Fetch the user's profile data from Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userProfile = userDoc.data();
 
-        // Update UI
+        // Update the UI with the user's profile data
         const userInfo = document.getElementById('user-info');
         if (userInfo) {
-          userInfo.innerText = `Welcome, ${firstName} ${lastName}!`;
+          userInfo.innerText = `Welcome, ${userProfile?.firstName || "Unknown"} ${userProfile?.lastName || ""}!`;
+        }
+
+        // Update the profile page content
+        const profileContent = document.getElementById('profile-content');
+        if (profileContent) {
+          profileContent.innerHTML = `
+            <div class="profile-card">
+              <img src="${user.photoURL}" alt="Profile Picture">
+              <h2 id="profile-name">${userProfile?.firstName || "Unknown"} ${userProfile?.lastName || ""}</h2>
+              <p class="email">${user.email}</p>
+              <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
+              <div id="edit-profile" style="display: none;">
+                <input type="text" id="edit-first-name" placeholder="First Name" value="${userProfile?.firstName || ""}">
+                <input type="text" id="edit-last-name" placeholder="Last Name" value="${userProfile?.lastName || ""}">
+                <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
+              </div>
+              <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
+            </div>
+          `;
         }
 
         // Automatically navigate to the Profile page after sign-in
         navigate('profile');
       } catch (error) {
         console.error("Error signing in:", error);
+        alert("Failed to sign in. Please try again.");
+      } finally {
+        const signInButton = document.getElementById('sign-in-button');
+        if (signInButton) {
+          signInButton.disabled = false;
+          signInButton.innerText = "Sign In with Google";
+        }
       }
     }
 
@@ -264,9 +315,24 @@
       }
     }
 
-    // Make signInWithGoogle and signOutUser globally accessible
+    // Function to update user's first and last name in Firestore
+    async function updateUserProfile(uid, firstName, lastName) {
+      try {
+        // Capitalize the first letter of first and last names
+        const capitalizedFirstName = capitalizeFirstLetter(firstName);
+        const capitalizedLastName = capitalizeFirstLetter(lastName);
+
+        await setDoc(doc(db, "users", uid), { firstName: capitalizedFirstName, lastName: capitalizedLastName }, { merge: true });
+        console.log("Profile updated successfully!");
+      } catch (error) {
+        console.error("Error updating profile:", error);
+      }
+    }
+
+    // Make signInWithGoogle, signOutUser, and updateUserProfile globally accessible
     window.signInWithGoogle = signInWithGoogle;
     window.signOutUser = signOutUser;
+    window.updateUserProfile = updateUserProfile;
 
     // Auto sign-in if already authenticated
     auth.onAuthStateChanged(async (user) => {
@@ -281,41 +347,32 @@
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const userData = userDoc.data();
 
-        // Log fetched user data
-        console.log("Fetched user data from Firestore:", userData);
-
-        if (userData) {
-          if (userInfo) {
-            userInfo.innerText = `Welcome back, ${userData.firstName} ${userData.lastName}!`;
-          }
-
-          if (profileContent) {
-            profileContent.innerHTML = `
-              <div class="profile-card">
-                <img src="${userData.photoURL}" alt="Profile Picture">
-                <h2>${userData.firstName} ${userData.lastName}</h2>
-                <p class="email">${userData.email}</p>
-                <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
-              </div>
-            `;
-          }
-
-          if (matchesContent) {
-            matchesContent.innerHTML = `
-              <p>Here are your matches!</p>
-              <!-- Add your match content here -->
-            `;
-          }
-        } else {
-          console.error("User data not found in Firestore.");
-          if (userInfo) {
-            userInfo.innerText = "Welcome! Please complete your profile.";
-          }
+        if (userInfo) {
+          userInfo.innerText = `Welcome back, ${userData?.firstName || "Unknown"} ${userData?.lastName || ""}!`;
         }
 
-        // Automatically navigate to the Profile page if already signed in
-        if (window.currentPage === 'profile') {
-          navigate('profile');
+        if (profileContent) {
+          profileContent.innerHTML = `
+            <div class="profile-card">
+              <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
+              <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
+              <p class="email">${userData?.email || "No email"}</p>
+              <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
+              <div id="edit-profile" style="display: none;">
+                <input type="text" id="edit-first-name" placeholder="First Name" value="${userData?.firstName || ""}">
+                <input type="text" id="edit-last-name" placeholder="Last Name" value="${userData?.lastName || ""}">
+                <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
+              </div>
+              <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
+            </div>
+          `;
+        }
+
+        if (matchesContent) {
+          matchesContent.innerHTML = `
+            <p>Here are your matches!</p>
+            <!-- Add your match content here -->
+          `;
         }
       } else {
         if (userInfo) {
@@ -392,6 +449,55 @@
 
     // Display the current date on page load
     displayCurrentDate();
+
+    // Function to enable profile editing
+    function enableEdit() {
+      const editProfileDiv = document.getElementById('edit-profile');
+      if (editProfileDiv) {
+        editProfileDiv.style.display = 'block';
+      }
+    }
+
+    // Function to save profile changes
+    async function saveProfile(uid) {
+      const firstName = document.getElementById('edit-first-name').value.trim();
+      const lastName = document.getElementById('edit-last-name').value.trim();
+
+      if (!firstName || !lastName) {
+        alert("Please fill in both first and last name.");
+        return;
+      }
+
+      try {
+        await updateUserProfile(uid, firstName, lastName);
+
+        // Update the displayed name
+        const profileName = document.getElementById('profile-name');
+        if (profileName) {
+          profileName.innerText = `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`;
+        }
+
+        // Hide the edit form
+        const editProfileDiv = document.getElementById('edit-profile');
+        if (editProfileDiv) {
+          editProfileDiv.style.display = 'none';
+        }
+
+        // Update the user info on the home page
+        const userInfo = document.getElementById('user-info');
+        if (userInfo) {
+          userInfo.innerText = `Welcome, ${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}!`;
+        }
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Failed to update profile. Please try again.");
+      }
+    }
+
+    // Utility function to capitalize the first letter of a string
+    function capitalizeFirstLetter(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
   </script>
 </body>
 </html>
