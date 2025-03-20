@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Matchmaking App</title>
   <!-- Heart Favicon -->
-  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZmYwMDAwIj48cGF0aCBkPSJNMTIgNC40MTljLTMuNjE1LTMuODI3LTkuNDkzLTMuODI3LTEzLjEwOCAwLTMuNjE1IDMuODI3LTMuNjE1IDEwLjAzIDAgMTMuODQ2TDEyIDI0bDEzLjEwOC01LjczNWMzLjYxNS0zLjgxNiAzLjYxNS0xMC4wMTkgMC0xMy44NDYtMy42MTUtMy44MjctOS40OTMtMy44MjctMTMuMTA4IDB6Ii8+PC9zdmc+" type="image/svg+xml">
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZmYwMDAwIj48cGF0aCBkPSJNMTIgNC40MTktMy42MTUtMy44MjctOS40OTMtMy44MjctMTMuMTA4IDAtMy42MTUgMy44MjctMy42MTUgMTAuMDMgMCAxMy44NDZMMTIgMjRsMTMuMTA4LTUuNzM1YzMuNjE1LTMuODE2IDMuNjE1LTEwLjAxOSAwLTEzLjg0Ni0zLjYxNS0zLjgyNy05LjQ5My0zLjgyNy0xMy4xMDggMHoiLz48L3N2Zz4=" type="image/svg+xml">
   <style>
     /* Dark theme with teal accents */
     body {
@@ -130,6 +130,10 @@
       font-size: 14px;
       color: #808080; /* Gray text */
     }
+    .profile-card .age {
+      font-size: 14px;
+      color: #808080; /* Gray text */
+    }
     .profile-card .sign-out-button {
       background-color: #ff4d4d; /* Red for sign-out button */
       color: white;
@@ -196,10 +200,10 @@
       <h1>Events</h1>
       <p>Check out upcoming events.</p>
     </div>
-    <div id="page-matches" class="page">
-      <h1>Matches</h1>
-      <div id="matches-content">
-        <p>Sign in to view your matches.</p>
+    <div id="page-interests" class="page">
+      <h1>Interests</h1>
+      <div id="interests-content">
+        <p>Sign in to view your interests.</p>
         <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
       </div>
     </div>
@@ -215,7 +219,7 @@
   <div class="navbar">
     <button id="nav-home" onclick="navigate('home')">Home</button>
     <button id="nav-events" onclick="navigate('events')">Events</button>
-    <button id="nav-matches" onclick="navigate('matches')">Matches</button>
+    <button id="nav-interests" onclick="navigate('interests')">Interests</button>
     <button id="nav-profile" onclick="navigate('profile')">Profile</button>
   </div>
 
@@ -260,12 +264,15 @@
           <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
           <p class="email">${userData?.email || "No email"}</p>
           <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
+          <p class="age">Age: ${userData?.age || "Not specified"}</p>
           <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
           <div id="edit-profile" style="display: none;">
             <input type="text" id="edit-first-name" placeholder="First Name" value="${userData?.firstName || ""}">
             <input type="text" id="edit-last-name" placeholder="Last Name" value="${userData?.lastName || ""}">
             <input type="text" id="edit-phone-number" placeholder="Phone Number" value="${userData?.phoneNumber || ""}" maxlength="10">
+            <input type="number" id="edit-age" placeholder="Age" value="${userData?.age || ""}">
             <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
+            <p class="error-message" id="age-error" style="display: none;">Please enter a valid age (18-100).</p>
             <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
           </div>
           <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
@@ -276,33 +283,6 @@
     // Redirect to Google's "Personal Info" page
     function redirectToGoogleProfile() {
       window.open("https://myaccount.google.com/personal-info", "_blank");
-    }
-
-    // Function to reload the user's profile data from Google
-    async function reloadUserProfile() {
-      const user = auth.currentUser;
-      if (user) {
-        // Force refresh the user's ID token to get the latest profile data
-        await user.reload();
-        const updatedUser = auth.currentUser;
-
-        // Update Firestore with the latest profile data
-        const userData = {
-          uid: updatedUser.uid,
-          email: updatedUser.email,
-          photoURL: updatedUser.photoURL,
-          firstName: updatedUser.displayName?.split(" ")[0] || "Unknown",
-          lastName: updatedUser.displayName?.split(" ")[1] || "",
-        };
-
-        await setDoc(doc(db, "users", updatedUser.uid), userData, { merge: true });
-
-        // Update the UI with the latest profile data
-        const profileContent = document.getElementById('profile-content');
-        if (profileContent) {
-          profileContent.innerHTML = renderProfileCard(updatedUser, userData);
-        }
-      }
     }
 
     // Sign in with Google
@@ -317,34 +297,35 @@
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
-        // Prepare user data for Firestore
-        const userData = {
-          uid: user.uid,
-          email: user.email,
-          photoURL: user.photoURL,
-          firstName: user.displayName?.split(" ")[0] || "Unknown",
-          lastName: user.displayName?.split(" ")[1] || "",
-          createdAt: new Date().toISOString(),
-        };
-
-        // Store user data in Firestore
-        await setDoc(doc(db, "users", user.uid), userData, { merge: true });
-
-        // Fetch the user's profile data from Firestore
+        // Fetch user data from Firestore
         const userDoc = await getDoc(doc(db, "users", user.uid));
-        const userProfile = userDoc.data();
+        let userData = userDoc.data();
+
+        // If Firestore data doesn't exist, create it using Google profile data
+        if (!userData) {
+          userData = {
+            uid: user.uid,
+            email: user.email,
+            photoURL: user.photoURL,
+            firstName: user.displayName?.split(" ")[0] || "Unknown",
+            lastName: user.displayName?.split(" ")[1] || "",
+            age: null, // Initialize age as null
+            createdAt: new Date().toISOString(),
+          };
+          await setDoc(doc(db, "users", user.uid), userData, { merge: true });
+        }
 
         // Update the UI with the user's profile data
         const userInfo = document.getElementById('user-info');
         if (userInfo) {
-          userInfo.innerText = `Welcome, ${userProfile?.firstName || "Unknown"} ${userProfile?.lastName || ""}!`;
+          userInfo.innerText = `Welcome, ${userData?.firstName || "Unknown"} ${userData?.lastName || ""}!`;
         }
 
         // Update the profile page content
         const profileContent = document.getElementById('profile-content');
         if (profileContent) {
-          profileContent.innerHTML = renderProfileCard(user, userProfile);
-          setupPhoneNumberValidation();
+          profileContent.innerHTML = renderProfileCard(user, userData);
+          setupInputValidation();
         }
 
         // Automatically navigate to the Profile page after sign-in
@@ -377,7 +358,7 @@
     }
 
     // Function to update user's profile in Firestore
-    async function updateUserProfile(uid, firstName, lastName, phoneNumber) {
+    async function updateUserProfile(uid, firstName, lastName, phoneNumber, age) {
       try {
         // Capitalize the first letter of first and last names
         const capitalizedFirstName = capitalizeFirstLetter(firstName);
@@ -387,6 +368,7 @@
           firstName: capitalizedFirstName,
           lastName: capitalizedLastName,
           phoneNumber: phoneNumber || null, // Save phone number (or null if empty)
+          age: age || null, // Save age (or null if empty)
         }, { merge: true });
         console.log("Profile updated successfully!");
       } catch (error) {
@@ -399,7 +381,6 @@
     window.signOutUser = signOutUser;
     window.updateUserProfile = updateUserProfile;
     window.redirectToGoogleProfile = redirectToGoogleProfile;
-    window.reloadUserProfile = reloadUserProfile;
 
     // Auto sign-in if already authenticated
     onAuthStateChanged(auth, async (user) => {
@@ -407,7 +388,7 @@
 
       const userInfo = document.getElementById('user-info');
       const profileContent = document.getElementById('profile-content');
-      const matchesContent = document.getElementById('matches-content');
+      const interestsContent = document.getElementById('interests-content');
 
       if (user) {
         // Fetch user data from Firestore
@@ -420,13 +401,13 @@
 
         if (profileContent) {
           profileContent.innerHTML = renderProfileCard(user, userData);
-          setupPhoneNumberValidation();
+          setupInputValidation();
         }
 
-        if (matchesContent) {
-          matchesContent.innerHTML = `
-            <p>Here are your matches!</p>
-            <!-- Add your match content here -->
+        if (interestsContent) {
+          interestsContent.innerHTML = `
+            <p>Here are your interests!</p>
+            <!-- Add your interests content here -->
           `;
         }
       } else {
@@ -439,18 +420,20 @@
             <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
           `;
         }
-        if (matchesContent) {
-          matchesContent.innerHTML = `
-            <p>Sign in to view your matches.</p>
+        if (interestsContent) {
+          interestsContent.innerHTML = `
+            <p>Sign in to view your interests.</p>
             <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
           `;
         }
       }
     });
 
-    // Function to set up phone number validation
-    function setupPhoneNumberValidation() {
+    // Function to set up input validation
+    function setupInputValidation() {
       const phoneInput = document.getElementById('edit-phone-number');
+      const ageInput = document.getElementById('edit-age');
+
       if (phoneInput) {
         phoneInput.addEventListener('input', function () {
           // Remove non-numeric characters
@@ -463,6 +446,19 @@
           } else {
             this.classList.remove('error');
             document.getElementById('phone-error').style.display = 'none';
+          }
+        });
+      }
+
+      if (ageInput) {
+        ageInput.addEventListener('input', function () {
+          const age = parseInt(this.value);
+          if (isNaN(age) || age < 18 || age > 100) {
+            this.classList.add('error');
+            document.getElementById('age-error').style.display = 'block';
+          } else {
+            this.classList.remove('error');
+            document.getElementById('age-error').style.display = 'none';
           }
         });
       }
@@ -538,6 +534,7 @@
       const firstName = document.getElementById('edit-first-name').value.trim();
       const lastName = document.getElementById('edit-last-name').value.trim();
       const phoneNumber = document.getElementById('edit-phone-number').value.trim();
+      const age = document.getElementById('edit-age').value.trim();
 
       if (!firstName || !lastName) {
         alert("Please fill in both first and last name.");
@@ -552,8 +549,17 @@
         return;
       }
 
+      // Validate age
+      const ageInput = document.getElementById('edit-age');
+      const ageNumber = parseInt(age);
+      if (isNaN(ageNumber) || ageNumber < 18 || ageNumber > 100) {
+        ageInput.classList.add('error');
+        document.getElementById('age-error').style.display = 'block';
+        return;
+      }
+
       try {
-        await updateUserProfile(uid, firstName, lastName, phoneNumber);
+        await updateUserProfile(uid, firstName, lastName, phoneNumber, ageNumber);
 
         // Update the displayed name
         const profileName = document.getElementById('profile-name');
@@ -565,6 +571,12 @@
         const phoneNumberElement = document.querySelector('.phone-number');
         if (phoneNumberElement) {
           phoneNumberElement.innerText = phoneNumber || "No phone number";
+        }
+
+        // Update the displayed age
+        const ageElement = document.querySelector('.age');
+        if (ageElement) {
+          ageElement.innerText = `Age: ${ageNumber || "Not specified"}`;
         }
 
         // Hide the edit form
