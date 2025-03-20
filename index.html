@@ -242,6 +242,16 @@
       color: var(--white);
     }
 
+    /* Admin Badge */
+    .admin-badge {
+      background-color: var(--teal);
+      color: var(--white);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
     /* Loading Spinner */
     .loader {
       border: 3px solid var(--gray);
@@ -329,6 +339,7 @@
         <div class="profile-card">
           <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
           <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
+          ${userData?.isAdmin ? `<span class="admin-badge">Admin</span>` : ''}
           <p class="email">${userData?.email || "No email"}</p>
           <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
           <p class="age">Age: ${userData?.age || "Not specified"}</p>
@@ -371,7 +382,8 @@
             photoURL: user.photoURL,
             firstName: user.displayName?.split(" ")[0] || "Unknown",
             lastName: user.displayName?.split(" ")[1] || "",
-            age: null, // Initialize age as null
+            age: null,
+            isAdmin: false, // Default to false
             createdAt: new Date().toISOString(),
           };
           await setDoc(doc(db, "users", user.uid), userData, { merge: true });
@@ -429,8 +441,8 @@
         await setDoc(doc(db, "users", uid), {
           firstName: capitalizedFirstName,
           lastName: capitalizedLastName,
-          phoneNumber: phoneNumber || null, // Save phone number (or null if empty)
-          age: age || null, // Save age (or null if empty)
+          phoneNumber: phoneNumber || null,
+          age: age || null,
         }, { merge: true });
         console.log("Profile updated successfully!");
       } catch (error) {
@@ -455,6 +467,9 @@
         // Fetch user data from Firestore
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const userData = userDoc.data();
+
+        // Store the current user globally
+        window.currentUser = userData;
 
         if (userInfo) {
           userInfo.innerText = `Welcome back, ${userData?.firstName || "Unknown"} ${userData?.lastName || ""}!`;
@@ -536,9 +551,12 @@
         userList.innerHTML = ""; // Clear the current list
         snapshot.forEach((doc) => {
           const userData = doc.data();
-          const listItem = document.createElement('li');
-          listItem.textContent = `${userData.firstName} ${userData.lastName}`;
-          userList.appendChild(listItem);
+          // Exclude admins from the list
+          if (!userData.isAdmin) {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${userData.firstName} ${userData.lastName}`;
+            userList.appendChild(listItem);
+          }
         });
       });
     }
