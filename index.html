@@ -187,6 +187,18 @@
       color: #00bcd4; /* Teal accent */
       margin-top: 10px;
     }
+    #user-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+    #user-list li {
+      background-color: #1f1f1f;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -205,6 +217,7 @@
       <div id="interests-content">
         <p>Sign in to view your interests.</p>
         <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
+        <ul id="user-list"></ul>
       </div>
     </div>
     <div id="page-profile" class="page">
@@ -228,7 +241,7 @@
     // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
     // Firebase configuration
     const firebaseConfig = {
@@ -407,8 +420,10 @@
         if (interestsContent) {
           interestsContent.innerHTML = `
             <p>Here are your interests!</p>
-            <!-- Add your interests content here -->
+            <ul id="user-list"></ul>
           `;
+          // Start listening for real-time updates to the user list
+          listenForUserUpdates();
         }
       } else {
         if (userInfo) {
@@ -462,6 +477,22 @@
           }
         });
       }
+    }
+
+    // Function to listen for real-time updates to the user list
+    function listenForUserUpdates() {
+      const userList = document.getElementById('user-list');
+      const q = query(collection(db, "users"));
+
+      onSnapshot(q, (snapshot) => {
+        userList.innerHTML = ""; // Clear the current list
+        snapshot.forEach((doc) => {
+          const userData = doc.data();
+          const listItem = document.createElement('li');
+          listItem.textContent = `${userData.firstName} ${userData.lastName}`;
+          userList.appendChild(listItem);
+        });
+      });
     }
   </script>
 
