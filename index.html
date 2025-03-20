@@ -40,17 +40,11 @@
     }
 
     .page {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      transition: opacity 0.5s ease;
+      display: none; /* Hide all pages by default */
     }
 
     .page.active {
-      opacity: 1;
+      display: block; /* Show the active page */
     }
 
     .navbar {
@@ -268,6 +262,29 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* Search Bar Styles */
+    #search-bar {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px;
+      margin: 20px auto;
+      border: 1px solid var(--teal);
+      border-radius: 5px;
+      background-color: var(--darker-bg);
+      color: var(--white);
+      font-size: 16px;
+    }
+
+    #search-bar::placeholder {
+      color: var(--gray);
+    }
+
+    /* Highlight Current User */
+    .current-user {
+      border: 2px solid var(--teal);
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -286,6 +303,7 @@
       <div id="interests-content">
         <p>Sign in to view your interests.</p>
         <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
+        <input type="text" id="search-bar" placeholder="Search for a name..." style="display: none;" autocomplete="off">
         <ul id="user-list"></ul>
       </div>
     </div>
@@ -404,6 +422,25 @@
 
         // Automatically navigate to the Profile page after sign-in
         navigate('profile');
+
+        // Update the interests page content
+        const interestsContent = document.getElementById('interests-content');
+        if (interestsContent) {
+          interestsContent.innerHTML = `
+            <p>Here are your interests!</p>
+            <input type="text" id="search-bar" placeholder="Search for a name..." autocomplete="off">
+            <ul id="user-list"></ul>
+          `;
+          // Show the search bar
+          const searchBar = document.getElementById('search-bar');
+          searchBar.style.display = 'block';
+
+          // Start listening for real-time updates to the user list
+          listenForUserUpdates();
+
+          // Add event listener for the search bar
+          searchBar.addEventListener('input', filterUserList);
+        }
       } catch (error) {
         console.error("Error signing in:", error);
         alert("Failed to sign in. Please try again.");
@@ -462,6 +499,7 @@
       const userInfo = document.getElementById('user-info');
       const profileContent = document.getElementById('profile-content');
       const interestsContent = document.getElementById('interests-content');
+      const searchBar = document.getElementById('search-bar');
 
       if (user) {
         // Fetch user data from Firestore
@@ -483,10 +521,17 @@
         if (interestsContent) {
           interestsContent.innerHTML = `
             <p>Here are your interests!</p>
+            <input type="text" id="search-bar" placeholder="Search for a name..." autocomplete="off">
             <ul id="user-list"></ul>
           `;
+          // Show the search bar
+          searchBar.style.display = 'block';
+
           // Start listening for real-time updates to the user list
           listenForUserUpdates();
+
+          // Add event listener for the search bar
+          searchBar.addEventListener('input', filterUserList);
         }
       } else {
         if (userInfo) {
@@ -506,6 +551,21 @@
         }
       }
     });
+
+    // Function to filter the user list based on search input
+    function filterUserList() {
+      const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+      const userListItems = document.querySelectorAll('#user-list li');
+
+      userListItems.forEach(item => {
+        const userName = item.textContent.toLowerCase();
+        if (userName.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
 
     // Function to set up input validation
     function setupInputValidation() {
@@ -551,12 +611,15 @@
         userList.innerHTML = ""; // Clear the current list
         snapshot.forEach((doc) => {
           const userData = doc.data();
-          // Exclude admins from the list
-          if (!userData.isAdmin) {
-            const listItem = document.createElement('li');
-            listItem.textContent = `${userData.firstName} ${userData.lastName}`;
-            userList.appendChild(listItem);
+          const listItem = document.createElement('li');
+          listItem.textContent = `${userData.firstName} ${userData.lastName}`;
+
+          // Highlight the current user
+          if (userData.uid === auth.currentUser?.uid) {
+            listItem.classList.add('current-user');
           }
+
+          userList.appendChild(listItem);
         });
       });
     }
