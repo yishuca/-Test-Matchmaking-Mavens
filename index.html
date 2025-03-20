@@ -5,9 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Matchmaking App</title>
   <!-- Heart Favicon -->
-  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZmYwMDAwIj48cGF0aCBkPSJNMTIgNC40MTktMy42MTUtMy44MjctOS40OTMtMy44MjctMTMuMTA4IDAtMy42MTUgMy44MjctMy42MTUgMTAuMDMgMCAxMy44NDZMMTIgMjRsMTMuMTA4LTUuNzM1YzMuNjE1LTMuODE2IDMuNjE1LTEwLjAxOSAwLTEzLjg0Ni0zLjYxNS0zLjgyNy05LjQ5My0zLjgyNy0xMy4xMDggMHoiLz48L3N2Zz4=" type="image/svg+xml">
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZmYwMDAwIj48cGF0aCBkPSJNMTIgNC40MTktMy42MTUtMy44MjctOS40OTMtMy44MjctMTMuMTA4IDAtMy42MTUgMy44MjctMy42MTUgMTAuMDMgMCAxMy44NDZMMTIgMjRsMTMuMTA4LTUuNzM1YzMuNjE1LTMuODE2IDMuNjE1LTEwLjAxOSAwLTEzLjg0Ni0zLjYxNS0zLjgyNy05LjQ5My0zLjgyNy0xMy4wODggMHoiLz48L3N2Zz4=" type="image/svg+xml">
   <style>
-    /* Dark theme with teal accents */
+    /* CSS Variables for Theme Management */
+    :root {
+      --teal: #00bcd4;
+      --dark-bg: #121212;
+      --darker-bg: #1f1f1f;
+      --white: #ffffff;
+      --gray: #b0b0b0;
+      --red: #ff4d4d;
+      --dark-red: #e60000;
+      --dark-teal: #0097a7;
+    }
+
+    /* Base Styles */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -15,16 +27,18 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
-      background-color: #121212; /* Dark background */
-      color: #ffffff; /* White text */
+      background-color: var(--dark-bg);
+      color: var(--white);
     }
+
     #content {
       flex: 1;
       padding: 20px;
       text-align: center;
-      overflow: hidden; /* Ensure content doesn't overflow during animations */
+      overflow: hidden;
       position: relative;
     }
+
     .page {
       position: absolute;
       width: 100%;
@@ -34,22 +48,25 @@
       opacity: 0;
       transition: opacity 0.5s ease;
     }
+
     .page.active {
       opacity: 1;
     }
+
     .navbar {
       display: flex;
       justify-content: space-around;
-      background-color: #1f1f1f; /* Darker navbar */
+      background-color: var(--darker-bg);
       padding: 10px 0;
       position: fixed;
       bottom: 0;
       width: 100%;
     }
+
     .navbar button {
       background: none;
       border: none;
-      color: #ffffff; /* White text */
+      color: var(--white);
       font-size: 16px;
       cursor: pointer;
       padding: 10px 20px;
@@ -58,6 +75,7 @@
       overflow: hidden;
       transition: color 0.3s ease;
     }
+
     .navbar button::after {
       content: '';
       position: absolute;
@@ -65,22 +83,28 @@
       left: 50%;
       width: 0;
       height: 3px;
-      background-color: #00bcd4; /* Teal accent */
+      background-color: var(--teal);
       transition: width 0.3s ease, left 0.3s ease;
     }
-    .navbar button:hover {
-      color: #00bcd4; /* Teal accent */
+
+    .navbar button:hover,
+    .navbar button:focus {
+      color: var(--teal);
+      outline: none;
     }
+
     .navbar button.active {
-      color: #00bcd4; /* Teal accent */
+      color: var(--teal);
     }
+
     .navbar button.active::after {
       width: 100%;
       left: 0;
     }
+
     #sign-in-button, #sign-out-button {
-      background-color: #00bcd4; /* Teal accent */
-      color: #ffffff; /* White text */
+      background-color: var(--teal);
+      color: var(--white);
       border: none;
       padding: 10px 20px;
       font-size: 16px;
@@ -89,11 +113,13 @@
       margin-top: 10px;
       transition: background-color 0.3s ease;
     }
+
     #sign-in-button:hover, #sign-out-button:hover {
-      background-color: #0097a7; /* Darker teal on hover */
+      background-color: var(--dark-teal);
     }
+
     .profile-card {
-      background: #1f1f1f; /* Darker card background */
+      background: var(--darker-bg);
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       padding: 20px;
@@ -101,42 +127,49 @@
       margin: 0 auto;
       text-align: center;
     }
+
     .profile-card img {
       width: 100px;
       height: 100px;
       border-radius: 50%;
       margin-bottom: 15px;
-      border: 3px solid #00bcd4; /* Teal accent */
-      cursor: pointer; /* Make the image clickable */
+      border: 3px solid var(--teal);
       transition: transform 0.3s ease;
     }
+
     .profile-card img:hover {
-      transform: scale(1.1); /* Add a hover effect */
+      transform: scale(1.1);
     }
+
     .profile-card h2 {
       margin: 10px 0;
       font-size: 24px;
-      color: #ffffff; /* White text */
+      color: var(--white);
     }
+
     .profile-card p {
       margin: 5px 0;
-      color: #b0b0b0; /* Light gray text */
+      color: var(--gray);
     }
+
     .profile-card .email {
       font-size: 14px;
-      color: #808080; /* Gray text */
+      color: #808080;
     }
+
     .profile-card .phone-number {
       font-size: 14px;
-      color: #808080; /* Gray text */
+      color: #808080;
     }
+
     .profile-card .age {
       font-size: 14px;
-      color: #808080; /* Gray text */
+      color: #808080;
     }
+
     .profile-card .sign-out-button {
-      background-color: #ff4d4d; /* Red for sign-out button */
-      color: white;
+      background-color: var(--red);
+      color: var(--white);
       border: none;
       padding: 10px 20px;
       font-size: 16px;
@@ -146,12 +179,14 @@
       width: 100%;
       transition: background-color 0.3s ease;
     }
+
     .profile-card .sign-out-button:hover {
-      background-color: #e60000; /* Darker red on hover */
+      background-color: var(--dark-red);
     }
+
     .profile-card .edit-button {
-      background-color: #00bcd4; /* Teal for edit button */
-      color: white;
+      background-color: var(--teal);
+      color: var(--white);
       border: none;
       padding: 10px 20px;
       font-size: 16px;
@@ -161,43 +196,67 @@
       width: 100%;
       transition: background-color 0.3s ease;
     }
+
     .profile-card .edit-button:hover {
-      background-color: #0097a7; /* Darker teal on hover */
+      background-color: var(--dark-teal);
     }
+
     .profile-card input {
-      width: calc(100% - 40px); /* Match the width of buttons */
+      width: calc(100% - 40px);
       padding: 10px;
       margin: 5px 0;
-      border: 1px solid #00bcd4;
+      border: 1px solid var(--teal);
       border-radius: 5px;
-      background-color: #1f1f1f;
-      color: #ffffff;
-      font-size: 16px; /* Match font size with buttons */
+      background-color: var(--darker-bg);
+      color: var(--white);
+      font-size: 16px;
     }
+
     .profile-card input.error {
-      border-color: #ff4d4d; /* Red border for invalid input */
+      border-color: var(--red);
     }
+
     .profile-card .error-message {
-      color: #ff4d4d; /* Red text for error messages */
+      color: var(--red);
       font-size: 14px;
       margin-top: 5px;
     }
+
     #current-date {
       font-size: 20px;
-      color: #00bcd4; /* Teal accent */
+      color: var(--teal);
       margin-top: 10px;
     }
+
     #user-list {
       list-style-type: none;
       padding: 0;
       margin: 20px 0;
     }
+
     #user-list li {
-      background-color: #1f1f1f;
+      background-color: var(--darker-bg);
       padding: 10px;
       margin: 5px 0;
       border-radius: 5px;
-      color: #ffffff;
+      color: var(--white);
+    }
+
+    /* Loading Spinner */
+    .loader {
+      border: 3px solid var(--gray);
+      border-top: 3px solid var(--teal);
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -264,16 +323,11 @@
     // Google Authentication
     const provider = new GoogleAuthProvider();
 
-    // Utility function to capitalize the first letter of a string
-    function capitalizeFirstLetter(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    }
-
     // Function to render the profile card
     function renderProfileCard(user, userData) {
       return `
         <div class="profile-card">
-          <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture" onclick="redirectToGoogleProfile()">
+          <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
           <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
           <p class="email">${userData?.email || "No email"}</p>
           <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
@@ -293,18 +347,13 @@
       `;
     }
 
-    // Redirect to Google's "Personal Info" page
-    function redirectToGoogleProfile() {
-      window.open("https://myaccount.google.com/personal-info", "_blank");
-    }
-
     // Sign in with Google
     async function signInWithGoogle() {
       try {
         const signInButton = document.getElementById('sign-in-button');
         if (signInButton) {
           signInButton.disabled = true;
-          signInButton.innerText = "Signing in...";
+          signInButton.innerHTML = `<span class="loader"></span> Signing in...`;
         }
 
         const result = await signInWithPopup(auth, provider);
@@ -393,7 +442,6 @@
     window.signInWithGoogle = signInWithGoogle;
     window.signOutUser = signOutUser;
     window.updateUserProfile = updateUserProfile;
-    window.redirectToGoogleProfile = redirectToGoogleProfile;
 
     // Auto sign-in if already authenticated
     onAuthStateChanged(auth, async (user) => {
@@ -498,6 +546,11 @@
 
   <!-- Global Navigation Script -->
   <script>
+    // Utility function to capitalize the first letter of a string
+    function capitalizeFirstLetter(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+
     // Track the current page
     window.currentPage = 'home';
 
@@ -625,11 +678,6 @@
         console.error("Error updating profile:", error);
         alert("Failed to update profile. Please try again.");
       }
-    }
-
-    // Utility function to capitalize the first letter of a string
-    function capitalizeFirstLetter(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
   </script>
 </body>
