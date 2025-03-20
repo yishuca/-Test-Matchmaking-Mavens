@@ -364,7 +364,7 @@
         const signInButton = document.getElementById('sign-in-button');
         if (signInButton) {
           signInButton.disabled = true;
-          signInButton.innerHTML = `<span class="loader"></span> Signing in...`;
+          signInButton.innerText = "Signing in...";
         }
 
         const result = await signInWithPopup(auth, provider);
