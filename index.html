@@ -35,8 +35,9 @@
       flex: 1;
       padding: 20px;
       text-align: center;
-      overflow: hidden;
+      overflow-y: auto; /* Allow vertical scrolling */
       position: relative;
+      padding-bottom: 80px; /* Add padding to account for the navbar */
     }
 
     .page {
@@ -120,8 +121,7 @@
       max-width: 400px;
       margin: 0 auto;
       text-align: center;
-      max-height: 80vh;
-      overflow-y: auto;
+      /* Remove max-height and overflow-y */
     }
 
     .profile-card img {
