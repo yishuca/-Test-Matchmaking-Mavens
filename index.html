@@ -61,7 +61,7 @@
       background: none;
       border: none;
       color: var(--white);
-      font-size: 18px; /* Increased from 16px to 18px */
+      font-size: 18px;
       cursor: pointer;
       padding: 10px 20px;
       border-radius: 5px;
@@ -96,7 +96,7 @@
       left: 0;
     }
 
-    #sign-in-button, #sign-out-button {
+    #signInButton, #signOutButton {
       background-color: var(--teal);
       color: var(--white);
       border: none;
@@ -108,7 +108,7 @@
       transition: background-color 0.3s ease;
     }
 
-    #sign-in-button:hover, #sign-out-button:hover {
+    #signInButton:hover, #signOutButton:hover {
       background-color: var(--dark-teal);
     }
 
@@ -120,8 +120,8 @@
       max-width: 400px;
       margin: 0 auto;
       text-align: center;
-      max-height: 80vh; /* Limit height to 80% of the viewport height */
-      overflow-y: auto; /* Enable vertical scrolling */
+      max-height: 80vh;
+      overflow-y: auto;
     }
 
     .profile-card img {
@@ -218,19 +218,19 @@
       margin-top: 5px;
     }
 
-    #current-date {
+    #currentDate {
       font-size: 20px;
       color: var(--teal);
       margin-top: 10px;
     }
 
-    #user-list {
+    #userList {
       list-style-type: none;
       padding: 0;
       margin: 20px 0;
     }
 
-    #user-list li {
+    #userList li {
       background-color: var(--darker-bg);
       padding: 10px;
       margin: 5px 0;
@@ -266,7 +266,7 @@
     }
 
     /* Search Bar Styles */
-    #search-bar {
+    #searchBar {
       width: 100%;
       max-width: 400px;
       padding: 10px;
@@ -278,7 +278,7 @@
       font-size: 16px;
     }
 
-    #search-bar::placeholder {
+    #searchBar::placeholder {
       color: var(--gray);
     }
 
@@ -290,32 +290,32 @@
 
     /* Responsive Styles for Mobile */
     @media (max-width: 600px) {
-      #search-bar {
-        width: 90%; /* Adjust width for smaller screens */
-        padding: 8px; /* Reduce padding for smaller screens */
-        font-size: 14px; /* Reduce font size for smaller screens */
+      #searchBar {
+        width: 90%;
+        padding: 8px;
+        font-size: 14px;
       }
 
       .navbar button {
-        padding: 8px 16px; /* Adjusted padding for smaller screens */
-        font-size: 16px; /* Increased from 14px to 16px */
+        padding: 8px 16px;
+        font-size: 16px;
       }
 
       .profile-card {
-        padding: 15px; /* Reduce padding for smaller screens */
+        padding: 15px;
       }
 
       .profile-card img {
-        width: 80px; /* Reduce image size for smaller screens */
+        width: 80px;
         height: 80px;
       }
 
       .profile-card h2 {
-        font-size: 20px; /* Reduce font size for smaller screens */
+        font-size: 20px;
       }
 
       .profile-card p {
-        font-size: 12px; /* Reduce font size for smaller screens */
+        font-size: 12px;
       }
     }
   </style>
@@ -324,8 +324,8 @@
   <div id="content">
     <div id="page-home" class="page active">
       <h1>Matchmaking App</h1>
-      <p id="current-date"></p>
-      <p id="user-info"></p>
+      <p id="currentDate"></p>
+      <p id="userInfo"></p>
     </div>
     <div id="page-events" class="page">
       <h1>Events</h1>
@@ -333,17 +333,17 @@
     </div>
     <div id="page-interests" class="page">
       <h1>Interests</h1>
-      <div id="interests-content">
+      <div id="interestsContent">
         <p>Sign in to view your interests.</p>
-        <input type="text" id="search-bar" placeholder="Search for a name..." style="display: none;" autocomplete="off">
-        <ul id="user-list"></ul>
+        <input type="text" id="searchBar" placeholder="Search for a name..." style="display: none;" autocomplete="off">
+        <ul id="userList"></ul>
       </div>
     </div>
     <div id="page-profile" class="page">
       <h1>Profile</h1>
-      <div id="profile-content">
-        <p id="profile-info">You are not signed in.</p>
-        <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
+      <div id="profileContent">
+        <p id="profileInfo">You are not signed in.</p>
+        <button id="signInButton" onclick="signInWithGoogle()">Sign In with Google</button>
       </div>
     </div>
   </div>
@@ -377,17 +377,40 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Make auth globally accessible
-    window.auth = auth;
+    // Cache DOM elements
+    let userInfo = document.getElementById('userInfo');
+    let profileContent = document.getElementById('profileContent');
+    let interestsContent = document.getElementById('interestsContent');
+    let searchBar = document.getElementById('searchBar');
+    let userList = document.getElementById('userList');
 
     // Google Authentication
     const provider = new GoogleAuthProvider();
 
-    // Function to initialize the search bar
+    // Debounce function for search input
+    function debounce(func, delay) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Function to filter the user list based on search input
+    function filterUserList() {
+      const searchTerm = searchBar.value.toLowerCase();
+      const userListItems = userList.querySelectorAll('li');
+
+      userListItems.forEach(item => {
+        const userName = item.textContent.toLowerCase();
+        item.style.display = userName.includes(searchTerm) ? 'block' : 'none';
+      });
+    }
+
+    // Initialize the search bar with debounced input
     function initializeSearchBar() {
-      const searchBar = document.getElementById('search-bar');
       if (searchBar) {
-        searchBar.addEventListener('input', filterUserList);
+        searchBar.addEventListener('input', debounce(filterUserList, 300));
       }
     }
 
@@ -396,19 +419,19 @@
       return `
         <div class="profile-card">
           <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
-          <h2 id="profile-name">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
+          <h2 id="profileName">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
           ${userData?.isAdmin ? `<span class="admin-badge">Admin</span>` : ''}
           <p class="email">${userData?.email || "No email"}</p>
           <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
           <p class="age">Age: ${userData?.age || "Not specified"}</p>
           <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
-          <div id="edit-profile" style="display: none;">
-            <input type="text" id="edit-first-name" placeholder="First Name" value="${userData?.firstName || ""}">
-            <input type="text" id="edit-last-name" placeholder="Last Name" value="${userData?.lastName || ""}">
-            <input type="text" id="edit-phone-number" placeholder="Phone Number" value="${userData?.phoneNumber || ""}" maxlength="10">
-            <input type="number" id="edit-age" placeholder="Age" value="${userData?.age || ""}">
-            <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
-            <p class="error-message" id="age-error" style="display: none;">Please enter a valid age (18-100).</p>
+          <div id="editProfile" style="display: none;">
+            <input type="text" id="editFirstName" placeholder="First Name" value="${userData?.firstName || ""}">
+            <input type="text" id="editLastName" placeholder="Last Name" value="${userData?.lastName || ""}">
+            <input type="text" id="editPhoneNumber" placeholder="Phone Number" value="${userData?.phoneNumber || ""}" maxlength="10">
+            <input type="number" id="editAge" placeholder="Age" value="${userData?.age || ""}">
+            <p class="error-message" id="phoneError" style="display: none;">Please enter a valid 10-digit phone number.</p>
+            <p class="error-message" id="ageError" style="display: none;">Please enter a valid age (18-100).</p>
             <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
             <button class="edit-button" onclick="cancelEdit()">Cancel</button>
           </div>
@@ -420,7 +443,7 @@
     // Sign in with Google
     async function signInWithGoogle() {
       try {
-        const signInButton = document.getElementById('sign-in-button');
+        const signInButton = document.getElementById('signInButton');
         if (signInButton) {
           signInButton.disabled = true;
           signInButton.innerText = "Signing in...";
@@ -449,13 +472,11 @@
         }
 
         // Update the UI with the user's profile data
-        const userInfo = document.getElementById('user-info');
         if (userInfo) {
           userInfo.innerText = `Welcome, ${userData?.firstName || "Unknown"} ${userData?.lastName || ""}!`;
         }
 
         // Update the profile page content
-        const profileContent = document.getElementById('profile-content');
         if (profileContent) {
           profileContent.innerHTML = renderProfileCard(user, userData);
           setupInputValidation();
@@ -465,28 +486,23 @@
         navigate('profile');
 
         // Update the interests page content
-        const interestsContent = document.getElementById('interests-content');
         if (interestsContent) {
           interestsContent.innerHTML = `
             <p>Here are your interests!</p>
-            <input type="text" id="search-bar" placeholder="Search for a name..." autocomplete="off">
-            <ul id="user-list"></ul>
+            <input type="text" id="searchBar" placeholder="Search for a name..." autocomplete="off">
+            <ul id="userList"></ul>
           `;
-          // Show the search bar
-          const searchBar = document.getElementById('search-bar');
-          searchBar.style.display = 'block';
-
-          // Initialize the search bar
+          // Reinitialize the search bar and user list
+          searchBar = document.getElementById('searchBar');
+          userList = document.getElementById('userList');
           initializeSearchBar();
-
-          // Start listening for real-time updates to the user list
-          listenForUserUpdates();
+          listenForUserUpdates(); // Ensure this is called
         }
       } catch (error) {
         console.error("Error signing in:", error);
         alert("Failed to sign in. Please try again.");
       } finally {
-        const signInButton = document.getElementById('sign-in-button');
+        const signInButton = document.getElementById('signInButton');
         if (signInButton) {
           signInButton.disabled = false;
           signInButton.innerText = "Sign In with Google";
@@ -498,7 +514,6 @@
     async function signOutUser() {
       try {
         await signOut(auth);
-        const userInfo = document.getElementById('user-info');
         if (userInfo) {
           userInfo.innerText = "You are signed out.";
         }
@@ -537,11 +552,6 @@
     onAuthStateChanged(auth, async (user) => {
       console.log("Auth state changed. User:", user);
 
-      const userInfo = document.getElementById('user-info');
-      const profileContent = document.getElementById('profile-content');
-      const interestsContent = document.getElementById('interests-content');
-      const searchBar = document.getElementById('search-bar');
-
       if (user) {
         // Fetch user data from Firestore
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -562,17 +572,14 @@
         if (interestsContent) {
           interestsContent.innerHTML = `
             <p>Here are your interests!</p>
-            <input type="text" id="search-bar" placeholder="Search for a name..." autocomplete="off">
-            <ul id="user-list"></ul>
+            <input type="text" id="searchBar" placeholder="Search for a name..." autocomplete="off">
+            <ul id="userList"></ul>
           `;
-          // Show the search bar
-          searchBar.style.display = 'block';
-
-          // Initialize the search bar
+          // Reinitialize the search bar and user list
+          searchBar = document.getElementById('searchBar');
+          userList = document.getElementById('userList');
           initializeSearchBar();
-
-          // Start listening for real-time updates to the user list
-          listenForUserUpdates();
+          listenForUserUpdates(); // Ensure this is called
         }
       } else {
         if (userInfo) {
@@ -580,8 +587,8 @@
         }
         if (profileContent) {
           profileContent.innerHTML = `
-            <p id="profile-info">You are not signed in.</p>
-            <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
+            <p id="profileInfo">You are not signed in.</p>
+            <button id="signInButton" onclick="signInWithGoogle()">Sign In with Google</button>
           `;
         }
         if (interestsContent) {
@@ -594,25 +601,10 @@
       }
     });
 
-    // Function to filter the user list based on search input
-    function filterUserList() {
-      const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-      const userListItems = document.querySelectorAll('#user-list li');
-
-      userListItems.forEach(item => {
-        const userName = item.textContent.toLowerCase();
-        if (userName.includes(searchTerm)) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    }
-
     // Function to set up input validation
     function setupInputValidation() {
-      const phoneInput = document.getElementById('edit-phone-number');
-      const ageInput = document.getElementById('edit-age');
+      const phoneInput = document.getElementById('editPhoneNumber');
+      const ageInput = document.getElementById('editAge');
 
       if (phoneInput) {
         phoneInput.addEventListener('input', function () {
@@ -622,10 +614,10 @@
           // Validate length
           if (this.value.length !== 10) {
             this.classList.add('error');
-            document.getElementById('phone-error').style.display = 'block';
+            document.getElementById('phoneError').style.display = 'block';
           } else {
             this.classList.remove('error');
-            document.getElementById('phone-error').style.display = 'none';
+            document.getElementById('phoneError').style.display = 'none';
           }
         });
       }
@@ -635,10 +627,10 @@
           const age = parseInt(this.value);
           if (isNaN(age) || age < 18 || age > 100) {
             this.classList.add('error');
-            document.getElementById('age-error').style.display = 'block';
+            document.getElementById('ageError').style.display = 'block';
           } else {
             this.classList.remove('error');
-            document.getElementById('age-error').style.display = 'none';
+            document.getElementById('ageError').style.display = 'none';
           }
         });
       }
@@ -646,10 +638,14 @@
 
     // Function to listen for real-time updates to the user list
     function listenForUserUpdates() {
-      const userList = document.getElementById('user-list');
       const q = query(collection(db, "users"));
 
       onSnapshot(q, (snapshot) => {
+        if (!userList) {
+          console.error("User list element not found.");
+          return;
+        }
+
         userList.innerHTML = ""; // Clear the current list
         snapshot.forEach((doc) => {
           const userData = doc.data();
@@ -668,7 +664,6 @@
 
     // Reinitialize the search bar on page load
     document.addEventListener('DOMContentLoaded', () => {
-      const searchBar = document.getElementById('search-bar');
       if (searchBar && auth.currentUser) {
         initializeSearchBar();
       }
@@ -725,7 +720,7 @@
 
     // Function to display the live current date
     function displayCurrentDate() {
-      const dateElement = document.getElementById('current-date');
+      const dateElement = document.getElementById('currentDate');
       if (dateElement) {
         const now = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -738,15 +733,17 @@
 
     // Function to enable profile editing
     function enableEdit() {
-      const editProfileDiv = document.getElementById('edit-profile');
+      const editProfileDiv = document.getElementById('editProfile');
       if (editProfileDiv) {
         editProfileDiv.style.display = 'block';
+        // Focus on the first input field for better accessibility
+        document.getElementById('editFirstName').focus();
       }
     }
 
     // Function to cancel profile editing
     function cancelEdit() {
-      const editProfileDiv = document.getElementById('edit-profile');
+      const editProfileDiv = document.getElementById('editProfile');
       if (editProfileDiv) {
         editProfileDiv.style.display = 'none';
       }
@@ -754,10 +751,10 @@
 
     // Function to save profile changes
     async function saveProfile(uid) {
-      const firstName = document.getElementById('edit-first-name').value.trim();
-      const lastName = document.getElementById('edit-last-name').value.trim();
-      const phoneNumber = document.getElementById('edit-phone-number').value.trim();
-      const age = document.getElementById('edit-age').value.trim();
+      const firstName = document.getElementById('editFirstName').value.trim();
+      const lastName = document.getElementById('editLastName').value.trim();
+      const phoneNumber = document.getElementById('editPhoneNumber').value.trim();
+      const age = document.getElementById('editAge').value.trim();
 
       if (!firstName || !lastName) {
         alert("Please fill in both first and last name.");
@@ -765,19 +762,19 @@
       }
 
       // Validate phone number
-      const phoneInput = document.getElementById('edit-phone-number');
+      const phoneInput = document.getElementById('editPhoneNumber');
       if (phoneNumber.length !== 10 || !/^\d+$/.test(phoneNumber)) {
         phoneInput.classList.add('error');
-        document.getElementById('phone-error').style.display = 'block';
+        document.getElementById('phoneError').style.display = 'block';
         return;
       }
 
       // Validate age
-      const ageInput = document.getElementById('edit-age');
+      const ageInput = document.getElementById('editAge');
       const ageNumber = parseInt(age);
       if (isNaN(ageNumber) || ageNumber < 18 || ageNumber > 100) {
         ageInput.classList.add('error');
-        document.getElementById('age-error').style.display = 'block';
+        document.getElementById('ageError').style.display = 'block';
         return;
       }
 
@@ -785,7 +782,7 @@
         await updateUserProfile(uid, firstName, lastName, phoneNumber, ageNumber);
 
         // Update the displayed name
-        const profileName = document.getElementById('profile-name');
+        const profileName = document.getElementById('profileName');
         if (profileName) {
           profileName.innerText = `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`;
         }
@@ -803,13 +800,12 @@
         }
 
         // Hide the edit form
-        const editProfileDiv = document.getElementById('edit-profile');
+        const editProfileDiv = document.getElementById('editProfile');
         if (editProfileDiv) {
           editProfileDiv.style.display = 'none';
         }
 
         // Update the user info on the home page
-        const userInfo = document.getElementById('user-info');
         if (userInfo) {
           userInfo.innerText = `Welcome, ${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}!`;
         }
