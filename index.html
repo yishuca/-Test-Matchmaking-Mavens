@@ -121,7 +121,6 @@
       max-width: 400px;
       margin: 0 auto;
       text-align: center;
-      /* Remove max-height and overflow-y */
     }
 
     .profile-card img {
@@ -385,6 +384,9 @@
     let searchBar = document.getElementById('searchBar');
     let userList = document.getElementById('userList');
 
+    // Store the unsubscribe function for the Firestore listener
+    let unsubscribeUserList;
+
     // Google Authentication
     const provider = new GoogleAuthProvider();
 
@@ -518,6 +520,12 @@
         if (userInfo) {
           userInfo.innerText = "You are signed out.";
         }
+
+        // Stop the Firestore listener
+        if (unsubscribeUserList) {
+          unsubscribeUserList();
+        }
+
         // Automatically navigate to the Profile page after sign-out
         navigate('profile');
       } catch (error) {
@@ -641,7 +649,7 @@
     function listenForUserUpdates() {
       const q = query(collection(db, "users"));
 
-      onSnapshot(q, (snapshot) => {
+      unsubscribeUserList = onSnapshot(q, (snapshot) => {
         if (!userList) {
           console.error("User list element not found.");
           return;
@@ -660,6 +668,13 @@
 
           userList.appendChild(listItem);
         });
+      }, (error) => {
+        // Handle Firestore errors gracefully
+        if (error.code === 'permission-denied') {
+          console.log("User does not have permission to access this data.");
+        } else {
+          console.error("Error listening for user updates:", error);
+        }
       });
     }
 
