@@ -333,7 +333,6 @@
       <h1>Interests</h1>
       <div id="interests-content">
         <p>Sign in to view your interests.</p>
-        <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
         <input type="text" id="search-bar" placeholder="Search for a name..." style="display: none;" autocomplete="off">
         <ul id="user-list"></ul>
       </div>
@@ -401,6 +400,7 @@
             <p class="error-message" id="phone-error" style="display: none;">Please enter a valid 10-digit phone number.</p>
             <p class="error-message" id="age-error" style="display: none;">Please enter a valid age (18-100).</p>
             <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
+            <button class="edit-button" onclick="cancelEdit()">Cancel</button>
           </div>
           <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
         </div>
@@ -577,8 +577,9 @@
         if (interestsContent) {
           interestsContent.innerHTML = `
             <p>Sign in to view your interests.</p>
-            <button id="sign-in-button" onclick="signInWithGoogle()">Sign In with Google</button>
           `;
+          // Hide the search bar
+          searchBar.style.display = 'none';
         }
       }
     });
@@ -722,6 +723,14 @@
       const editProfileDiv = document.getElementById('edit-profile');
       if (editProfileDiv) {
         editProfileDiv.style.display = 'block';
+      }
+    }
+
+    // Function to cancel profile editing
+    function cancelEdit() {
+      const editProfileDiv = document.getElementById('edit-profile');
+      if (editProfileDiv) {
+        editProfileDiv.style.display = 'none';
       }
     }
 
