@@ -381,6 +381,14 @@
     // Google Authentication
     const provider = new GoogleAuthProvider();
 
+    // Function to initialize the search bar
+    function initializeSearchBar() {
+      const searchBar = document.getElementById('search-bar');
+      if (searchBar) {
+        searchBar.addEventListener('input', filterUserList);
+      }
+    }
+
     // Function to render the profile card
     function renderProfileCard(user, userData) {
       return `
@@ -466,11 +474,11 @@
           const searchBar = document.getElementById('search-bar');
           searchBar.style.display = 'block';
 
+          // Initialize the search bar
+          initializeSearchBar();
+
           // Start listening for real-time updates to the user list
           listenForUserUpdates();
-
-          // Add event listener for the search bar
-          searchBar.addEventListener('input', filterUserList);
         }
       } catch (error) {
         console.error("Error signing in:", error);
@@ -558,11 +566,11 @@
           // Show the search bar
           searchBar.style.display = 'block';
 
+          // Initialize the search bar
+          initializeSearchBar();
+
           // Start listening for real-time updates to the user list
           listenForUserUpdates();
-
-          // Add event listener for the search bar
-          searchBar.addEventListener('input', filterUserList);
         }
       } else {
         if (userInfo) {
@@ -655,6 +663,14 @@
         });
       });
     }
+
+    // Reinitialize the search bar on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchBar = document.getElementById('search-bar');
+      if (searchBar && auth.currentUser) {
+        initializeSearchBar();
+      }
+    });
   </script>
 
   <!-- Global Navigation Script -->
