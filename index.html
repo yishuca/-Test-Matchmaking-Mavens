@@ -35,17 +35,21 @@
       flex: 1;
       padding: 20px;
       text-align: center;
-      overflow-y: auto; /* Allow vertical scrolling */
+      overflow-y: auto;
       position: relative;
       padding-bottom: 80px; /* Add padding to account for the navbar */
     }
 
+    /* Page Transition Styles */
     .page {
       display: none; /* Hide all pages by default */
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
     }
 
     .page.active {
       display: block; /* Show the active page */
+      opacity: 1;
     }
 
     .navbar {
@@ -127,7 +131,7 @@
       width: 100px;
       height: 100px;
       border-radius: 50%;
-      margin-top: 15px; /* Add space above the profile picture */
+      margin-top: 15px;
       margin-bottom: 15px;
       border: 3px solid var(--teal);
       transition: transform 0.3s ease;
@@ -360,7 +364,7 @@
     // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, query, limit } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
     // Firebase configuration
     const firebaseConfig = {
@@ -378,9 +382,9 @@
     const db = getFirestore(app);
 
     // Cache DOM elements
-    let userInfo = document.getElementById('userInfo');
-    let profileContent = document.getElementById('profileContent');
-    let interestsContent = document.getElementById('interestsContent');
+    const userInfo = document.getElementById('userInfo');
+    const profileContent = document.getElementById('profileContent');
+    const interestsContent = document.getElementById('interestsContent');
     let searchBar = document.getElementById('searchBar');
     let userList = document.getElementById('userList');
 
@@ -489,18 +493,7 @@
         navigate('profile');
 
         // Update the interests page content
-        if (interestsContent) {
-          interestsContent.innerHTML = `
-            <p>Here are your interests!</p>
-            <input type="text" id="searchBar" placeholder="Search for a name..." autocomplete="off">
-            <ul id="userList"></ul>
-          `;
-          // Reinitialize the search bar and user list
-          searchBar = document.getElementById('searchBar');
-          userList = document.getElementById('userList');
-          initializeSearchBar();
-          listenForUserUpdates(); // Ensure this is called
-        }
+        initializeInterestsPage();
       } catch (error) {
         console.error("Error signing in:", error);
         alert("Failed to sign in. Please try again.");
@@ -579,16 +572,7 @@
         }
 
         if (interestsContent) {
-          interestsContent.innerHTML = `
-            <p>Here are your interests!</p>
-            <input type="text" id="searchBar" placeholder="Search for a name..." autocomplete="off">
-            <ul id="userList"></ul>
-          `;
-          // Reinitialize the search bar and user list
-          searchBar = document.getElementById('searchBar');
-          userList = document.getElementById('userList');
-          initializeSearchBar();
-          listenForUserUpdates(); // Ensure this is called
+          initializeInterestsPage();
         }
       } else {
         if (userInfo) {
@@ -647,7 +631,7 @@
 
     // Function to listen for real-time updates to the user list
     function listenForUserUpdates() {
-      const q = query(collection(db, "users"));
+      const q = query(collection(db, "users"), limit(10)); // Limit to 10 users for lazy loading
 
       unsubscribeUserList = onSnapshot(q, (snapshot) => {
         if (!userList) {
@@ -676,6 +660,20 @@
           console.error("Error listening for user updates:", error);
         }
       });
+    }
+
+    // Function to initialize the interests page
+    function initializeInterestsPage() {
+      interestsContent.innerHTML = `
+        <p>Here are your interests!</p>
+        <input type="text" id="searchBar" placeholder="Search for a name..." autocomplete="off">
+        <ul id="userList"></ul>
+      `;
+      // Reinitialize the search bar and user list
+      searchBar = document.getElementById('searchBar');
+      userList = document.getElementById('userList');
+      initializeSearchBar();
+      listenForUserUpdates();
     }
 
     // Reinitialize the search bar on page load
@@ -718,9 +716,17 @@
       if (currentPageElement && newPageElement) {
         // Fade out the current page
         currentPageElement.classList.remove('active');
+        currentPageElement.style.opacity = 0;
 
-        // Fade in the new page
-        newPageElement.classList.add('active');
+        // Wait for the fade-out transition to complete
+        setTimeout(() => {
+          currentPageElement.style.display = 'none';
+          newPageElement.style.display = 'block';
+          setTimeout(() => {
+            newPageElement.classList.add('active');
+            newPageElement.style.opacity = 1;
+          }, 10); // Small delay to ensure display: block is applied
+        }, 500); // Match the transition duration
       }
     }
 
