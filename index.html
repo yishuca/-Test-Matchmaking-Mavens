@@ -44,7 +44,7 @@
     .page {
       display: none; /* Hide all pages by default */
       opacity: 0;
-      transition: opacity 0.5s ease-in-out;
+      transition: opacity 0.3s ease-in-out;
     }
 
     .page.active {
@@ -708,7 +708,7 @@
       }
     }
 
-    // Function to switch pages with uniform fade animation
+    // Function to switch pages with smooth fade transitions
     function switchPage(newPage) {
       const currentPageElement = document.querySelector('.page.active');
       const newPageElement = document.getElementById(`page-${newPage}`);
@@ -721,12 +721,14 @@
         // Wait for the fade-out transition to complete
         setTimeout(() => {
           currentPageElement.style.display = 'none';
+
+          // Show and fade in the new page
           newPageElement.style.display = 'block';
           setTimeout(() => {
             newPageElement.classList.add('active');
             newPageElement.style.opacity = 1;
           }, 10); // Small delay to ensure display: block is applied
-        }, 500); // Match the transition duration
+        }, 300); // Match the transition duration
       }
     }
 
@@ -734,7 +736,7 @@
     function navigate(page) {
       window.currentPage = page; // Update the current page
       updateActiveNavButton(page); // Update the active navigation button
-      switchPage(page); // Switch pages with uniform fade animation
+      switchPage(page); // Switch pages with smooth fade transitions
     }
 
     // Initialize the home page on load
