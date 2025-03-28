@@ -1,843 +1,797 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matchmaking App</title>
-  <!-- Heart Favicon -->
-  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZmYwMDAwIj48cGF0aCBkPSJNMTIgNC40MTktMy42MTUtMy44MjctOS40OTMtMy44MjctMTMuMTA4IDAtMy42MTUgMy44MjctMy42MTUgMTAuMDMgMCAxMy44NDZMMTIgMjRsMTMuMTA4LTUuNzM1YzMuNjE1LTMuODE2IDMuNjE1LTEwLjAxOSAwLTEzLjg0Ni0zLjYxNS0zLjgyNy05LjQ5My0zLjgyNy0xMy4wODggMHoiLz48L3N2Zz4=" type="image/svg+xml">
-  <style>
-    /* CSS Variables for Theme Management */
-    :root {
-      --teal: #00bcd4;
-      --dark-bg: #121212;
-      --darker-bg: #1f1f1f;
-      --white: #ffffff;
-      --gray: #b0b0b0;
-      --red: #ff4d4d;
-      --dark-red: #e60000;
-      --dark-teal: #0097a7;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Comfy Cemetery | A Dark & Cozy Blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --blood-red: #6a0000;
+            --light-blood: #8b0000;
+            --text: #e0e0e0;
+            --text-light: #ffffff;
+            --cozy-gold: #c9a66b;
+        }
 
-    /* Base Styles */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      background-color: var(--dark-bg);
-      color: var(--white);
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    #content {
-      flex: 1;
-      padding: 20px;
-      text-align: center;
-      overflow-y: auto;
-      position: relative;
-      padding-bottom: 80px; /* Add padding to account for the navbar */
-    }
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--text);
+            background-color: var(--darker);
+            overflow-x: hidden;
+            line-height: 1.8;
+            font-weight: 300;
+        }
 
-    /* Page Transition Styles */
-    .page {
-      display: none; /* Hide all pages by default */
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cinzel Decorative', serif;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
 
-    .page.active {
-      display: block; /* Show the active page */
-      opacity: 1;
-    }
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+        }
 
-    .navbar {
-      display: flex;
-      justify-content: space-around;
-      background-color: var(--darker-bg);
-      padding: 10px 0;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
+        h2 {
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+        }
 
-    .navbar button {
-      background: none;
-      border: none;
-      color: var(--white);
-      font-size: 18px;
-      cursor: pointer;
-      padding: 10px 20px;
-      border-radius: 5px;
-      position: relative;
-      overflow: hidden;
-      transition: color 0.3s ease;
-    }
+        h2:after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 2px;
+            background: var(--blood-red);
+            bottom: -10px;
+            left: 0;
+        }
 
-    .navbar button::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 0;
-      height: 3px;
-      background-color: var(--teal);
-      transition: width 0.3s ease, left 0.3s ease;
-    }
+        a {
+            color: var(--cozy-gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
 
-    .navbar button:hover,
-    .navbar button:focus {
-      color: var(--teal);
-      outline: none;
-    }
+        a:hover {
+            color: var(--light-blood);
+        }
 
-    .navbar button.active {
-      color: var(--teal);
-    }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--blood-red);
+            border-radius: 0;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    .navbar button.active::after {
-      width: 100%;
-      left: 0;
-    }
+        .btn:hover {
+            background-color: var(--blood-red);
+            transform: translateY(-2px);
+        }
 
-    #signInButton, #signOutButton {
-      background-color: var(--teal);
-      color: var(--white);
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
-      margin-top: 10px;
-      transition: background-color 0.3s ease;
-    }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-    #signInButton:hover, #signOutButton:hover {
-      background-color: var(--dark-teal);
-    }
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 25px 0;
+            transition: all 0.3s ease;
+        }
 
-    .profile-card {
-      background: var(--darker-bg);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      padding: 20px;
-      max-width: 400px;
-      margin: 0 auto;
-      text-align: center;
-    }
+        header.scrolled {
+            background-color: rgba(10, 10, 10, 0.95);
+            padding: 15px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
 
-    .profile-card img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      margin-top: 15px;
-      margin-bottom: 15px;
-      border: 3px solid var(--teal);
-      transition: transform 0.3s ease;
-    }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .profile-card img:hover {
-      transform: scale(1.1);
-    }
+        .logo {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 2px;
+        }
 
-    .profile-card h2 {
-      margin: 10px 0;
-      font-size: 24px;
-      color: var(--white);
-    }
+        .logo span {
+            color: var(--blood-red);
+        }
 
-    .profile-card p {
-      margin: 5px 0;
-      color: var(--gray);
-    }
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
 
-    .profile-card .email {
-      font-size: 14px;
-      color: #808080;
-    }
+        nav ul li {
+            margin-left: 30px;
+        }
 
-    .profile-card .phone-number {
-      font-size: 14px;
-      color: #808080;
-    }
+        nav ul li a {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            position: relative;
+        }
 
-    .profile-card .age {
-      font-size: 14px;
-      color: #808080;
-    }
+        nav ul li a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            background: var(--blood-red);
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
 
-    .profile-card .sign-out-button {
-      background-color: var(--red);
-      color: var(--white);
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
-      margin-top: 20px;
-      width: 100%;
-      transition: background-color 0.3s ease;
-    }
+        nav ul li a:hover:after {
+            width: 100%;
+        }
 
-    .profile-card .sign-out-button:hover {
-      background-color: var(--dark-red);
-    }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
 
-    .profile-card .edit-button {
-      background-color: var(--teal);
-      color: var(--white);
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
-      margin-top: 10px;
-      width: 100%;
-      transition: background-color 0.3s ease;
-    }
+        /* Hero Section with Parallax Video */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
 
-    .profile-card .edit-button:hover {
-      background-color: var(--dark-teal);
-    }
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
 
-    .profile-card input {
-      width: calc(100% - 40px);
-      padding: 10px;
-      margin: 5px 0;
-      border: 1px solid var(--teal);
-      border-radius: 5px;
-      background-color: var(--darker-bg);
-      color: var(--white);
-      font-size: 16px;
-    }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.5), rgba(5, 5, 5, 0.9));
+            z-index: -1;
+        }
 
-    .profile-card input.error {
-      border-color: var(--red);
-    }
+        .hero-content {
+            max-width: 800px;
+            padding: 0 20px;
+        }
 
-    .profile-card .error-message {
-      color: var(--red);
-      font-size: 14px;
-      margin-top: 5px;
-    }
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
 
-    #currentDate {
-      font-size: 20px;
-      color: var(--teal);
-      margin-top: 10px;
-    }
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    #userList {
-      list-style-type: none;
-      padding: 0;
-      margin: 20px 0;
-    }
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 1;
+            background-color: var(--darker);
+        }
 
-    #userList li {
-      background-color: var(--darker-bg);
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      color: var(--white);
-    }
+        /* Blog Posts Section */
+        .blog-posts {
+            padding: 100px 0;
+        }
 
-    /* Admin Badge */
-    .admin-badge {
-      background-color: var(--teal);
-      color: var(--white);
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 14px;
-      margin-left: 10px;
-    }
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
 
-    /* Loading Spinner */
-    .loader {
-      border: 3px solid var(--gray);
-      border-top: 3px solid var(--teal);
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-    }
+        .post-card {
+            background-color: rgba(20, 20, 20, 0.7);
+            border: 1px solid #222;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+        .post-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: var(--blood-red);
+        }
 
-    /* Search Bar Styles */
-    #searchBar {
-      width: 100%;
-      max-width: 400px;
-      padding: 10px;
-      margin: 20px auto;
-      border: 1px solid var(--teal);
-      border-radius: 5px;
-      background-color: var(--darker-bg);
-      color: var(--white);
-      font-size: 16px;
-    }
+        .post-image {
+            height: 250px;
+            overflow: hidden;
+        }
 
-    #searchBar::placeholder {
-      color: var(--gray);
-    }
+        .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
 
-    /* Highlight Current User */
-    .current-user {
-      border: 2px solid var(--teal);
-      font-weight: bold;
-    }
+        .post-card:hover .post-image img {
+            transform: scale(1.05);
+        }
 
-    /* Responsive Styles for Mobile */
-    @media (max-width: 600px) {
-      #searchBar {
-        width: 90%;
-        padding: 8px;
-        font-size: 14px;
-      }
+        .post-content {
+            padding: 30px;
+        }
 
-      .navbar button {
-        padding: 8px 16px;
-        font-size: 16px;
-      }
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #999;
+        }
 
-      .profile-card {
-        padding: 15px;
-      }
+        .post-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background-color: var(--blood-red);
+            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
 
-      .profile-card img {
-        width: 80px;
-        height: 80px;
-      }
+        .post-excerpt {
+            margin: 20px 0;
+        }
 
-      .profile-card h2 {
-        font-size: 20px;
-      }
+        .read-more {
+            display: inline-block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: var(--cozy-gold);
+        }
 
-      .profile-card p {
-        font-size: 12px;
-      }
-    }
-  </style>
+        /* About Section */
+        .about {
+            padding: 100px 0;
+            background-color: rgba(15, 15, 15, 0.7);
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 40px;
+        }
+
+        .about-image {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            padding: 80px 0;
+            text-align: center;
+            background-color: rgba(10, 10, 10, 0.9);
+        }
+
+        .newsletter-form {
+            max-width: 600px;
+            margin: 40px auto 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            background-color: rgba(20, 20, 20, 0.7);
+            border: 1px solid #333;
+            color: var(--text);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--darker);
+            padding: 80px 0 30px;
+            text-align: center;
+            border-top: 1px solid #222;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 60px;
+        }
+
+        .footer-column {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 2px;
+            background: var(--blood-red);
+            bottom: -10px;
+            left: 0;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--cozy-gold);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(20, 20, 20, 0.7);
+            border-radius: 50%;
+            margin-right: 15px;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--blood-red);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            
+            .posts-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                max-width: 300px;
+                height: 100vh;
+                background-color: var(--darker);
+                padding: 80px 30px;
+                transition: all 0.5s ease;
+                z-index: 999;
+            }
+
+            nav.active {
+                right: 0;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav ul li {
+                margin: 20px 0;
+            }
+
+            .close-menu-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: none;
+                border: none;
+                color: var(--text-light);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .about-text, .about-image {
+                flex: 100%;
+            }
+
+            .about-text {
+                padding-right: 0;
+                margin-bottom: 40px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .blog-posts, .about {
+                padding: 60px 0;
+            }
+
+            .newsletter-form input {
+                min-width: 100%;
+                margin-right: 0;
+            }
+
+            .footer-column {
+                flex: 100%;
+                text-align: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .footer-links {
+                text-align: center;
+            }
+
+            .footer-column h3:after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="content">
-    <div id="page-home" class="page active">
-      <h1>Matchmaking App</h1>
-      <p id="currentDate"></p>
-      <p id="userInfo"></p>
-    </div>
-    <div id="page-events" class="page">
-      <h1>Events</h1>
-      <p>Check out upcoming events.</p>
-    </div>
-    <div id="page-interests" class="page">
-      <h1>Interests</h1>
-      <div id="interestsContent">
-        <p>Sign in to view your interests.</p>
-        <input type="text" id="searchBar" placeholder="Search for a name..." style="display: none;" autocomplete="off">
-        <ul id="userList"></ul>
-      </div>
-    </div>
-    <div id="page-profile" class="page">
-      <h1>Profile</h1>
-      <div id="profileContent">
-        <p id="profileInfo">You are not signed in.</p>
-        <button id="signInButton" onclick="signInWithGoogle()">Sign In with Google</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="navbar">
-    <button id="nav-home" onclick="navigate('home')">Home</button>
-    <button id="nav-events" onclick="navigate('events')">Events</button>
-    <button id="nav-interests" onclick="navigate('interests')">Interests</button>
-    <button id="nav-profile" onclick="navigate('profile')">Profile</button>
-  </div>
-
-  <!-- Firebase and Google Auth -->
-  <script type="module">
-    // Import Firebase modules
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, query, limit } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
-
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDud3wUvSoqN1f3EM5MpJeKEpIaqzNBN_0",
-      authDomain: "matchmakingapp-3fba6.firebaseapp.com",
-      projectId: "matchmakingapp-3fba6",
-      storageBucket: "matchmakingapp-3fba6.appspot.com",
-      messagingSenderId: "905060673802",
-      appId: "1:905060673802:web:84e1d026280146dde472f3"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Cache DOM elements
-    const userInfo = document.getElementById('userInfo');
-    const profileContent = document.getElementById('profileContent');
-    const interestsContent = document.getElementById('interestsContent');
-    let searchBar = document.getElementById('searchBar');
-    let userList = document.getElementById('userList');
-
-    // Store the unsubscribe function for the Firestore listener
-    let unsubscribeUserList;
-
-    // Google Authentication
-    const provider = new GoogleAuthProvider();
-
-    // Debounce function for search input
-    function debounce(func, delay) {
-      let timeout;
-      return function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), delay);
-      };
-    }
-
-    // Function to filter the user list based on search input
-    function filterUserList() {
-      const searchTerm = searchBar.value.toLowerCase();
-      const userListItems = userList.querySelectorAll('li');
-
-      userListItems.forEach(item => {
-        const userName = item.textContent.toLowerCase();
-        item.style.display = userName.includes(searchTerm) ? 'block' : 'none';
-      });
-    }
-
-    // Initialize the search bar with debounced input
-    function initializeSearchBar() {
-      if (searchBar) {
-        searchBar.addEventListener('input', debounce(filterUserList, 300));
-      }
-    }
-
-    // Function to render the profile card
-    function renderProfileCard(user, userData) {
-      return `
-        <div class="profile-card">
-          <img src="${userData?.photoURL || "https://via.placeholder.com/100"}" alt="Profile Picture">
-          <h2 id="profileName">${userData?.firstName || "Unknown"} ${userData?.lastName || ""}</h2>
-          ${userData?.isAdmin ? `<span class="admin-badge">Admin</span>` : ''}
-          <p class="email">${userData?.email || "No email"}</p>
-          <p class="phone-number">${userData?.phoneNumber || "No phone number"}</p>
-          <p class="age">Age: ${userData?.age || "Not specified"}</p>
-          <button class="edit-button" onclick="enableEdit()">Edit Profile</button>
-          <div id="editProfile" style="display: none;">
-            <input type="text" id="editFirstName" placeholder="First Name" value="${userData?.firstName || ""}">
-            <input type="text" id="editLastName" placeholder="Last Name" value="${userData?.lastName || ""}">
-            <input type="text" id="editPhoneNumber" placeholder="Phone Number" value="${userData?.phoneNumber || ""}" maxlength="10">
-            <input type="number" id="editAge" placeholder="Age" value="${userData?.age || ""}">
-            <p class="error-message" id="phoneError" style="display: none;">Please enter a valid 10-digit phone number.</p>
-            <p class="error-message" id="ageError" style="display: none;">Please enter a valid age (18-100).</p>
-            <button class="edit-button" onclick="saveProfile('${user.uid}')">Save</button>
-            <button class="edit-button" onclick="cancelEdit()">Cancel</button>
-          </div>
-          <button class="sign-out-button" onclick="signOutUser()">Sign Out</button>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="#" class="logo">THE COMFY <span>CEMETERY</span></a>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <nav id="nav">
+                <button class="close-menu-btn" id="closeMenuBtn">×</button>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#newsletter">Newsletter</a></li>
+                </ul>
+            </nav>
         </div>
-      `;
-    }
+    </header>
 
-    // Sign in with Google
-    async function signInWithGoogle() {
-      try {
-        const signInButton = document.getElementById('signInButton');
-        if (signInButton) {
-          signInButton.disabled = true;
-          signInButton.innerText = "Signing in...";
-        }
+    <!-- Hero Section with Parallax Video -->
+    <section class="hero" id="home">
+        <!-- Replace "your-video.mp4" with your actual video file -->
+        <video class="video-background" autoplay muted loop>
+            <source src="your-video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Welcome to The Comfy Cemetery</h1>
+            <p>A cozy corner for dark thoughts, eerie tales, and midnight musings.</p>
+            <a href="#blog" class="btn">Read the Blog</a>
+        </div>
+    </section>
 
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+    <!-- Main Content -->
+    <main>
+        <!-- Blog Posts Section -->
+        <section class="blog-posts" id="blog">
+            <div class="container">
+                <h2>Latest Epitaphs</h2>
+                <div class="posts-grid">
+                    <!-- Post 1 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            <img src="https://source.unsplash.com/random/600x400/?graveyard" alt="Midnight in the Graveyard">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span>October 31, 2023</span>
+                                <span>7 min read</span>
+                            </div>
+                            <h3>Midnight in the Graveyard</h3>
+                            <div class="post-tags">
+                                <span class="post-tag">Dark Tales</span>
+                                <span class="post-tag">Poetry</span>
+                            </div>
+                            <p class="post-excerpt">The graveyard is most alive when the world is asleep. In this piece, I explore the whispers between tombstones and the comfort of eternal rest...</p>
+                            <a href="#" class="read-more">Continue Reading →</a>
+                        </div>
+                    </article>
 
-        // Fetch user data from Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        let userData = userDoc.data();
+                    <!-- Post 2 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            <img src="https://source.unsplash.com/random/600x400/?gothic" alt="Gothic Comfort">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span>September 15, 2023</span>
+                                <span>10 min read</span>
+                            </div>
+                            <h3>Gothic Comfort</h3>
+                            <div class="post-tags">
+                                <span class="post-tag">Lifestyle</span>
+                                <span class="post-tag">Aesthetics</span>
+                            </div>
+                            <p class="post-excerpt">How to make darkness feel like home—candles, velvet, and the perfect playlist for a stormy night. A guide to embracing the macabre with warmth...</p>
+                            <a href="#" class="read-more">Continue Reading →</a>
+                        </div>
+                    </article>
 
-        // If Firestore data doesn't exist, create it using Google profile data
-        if (!userData) {
-          userData = {
-            uid: user.uid,
-            email: user.email,
-            photoURL: user.photoURL,
-            firstName: user.displayName?.split(" ")[0] || "Unknown",
-            lastName: user.displayName?.split(" ")[1] || "",
-            age: null,
-            isAdmin: false, // Default to false
-            createdAt: new Date().toISOString(),
-          };
-          await setDoc(doc(db, "users", user.uid), userData, { merge: true });
-        }
+                    <!-- Post 3 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            <img src="https://source.unsplash.com/random/600x400/?haunted" alt="Ghost Stories for the Soul">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span>August 7, 2023</span>
+                                <span>12 min read</span>
+                            </div>
+                            <h3>Ghost Stories for the Soul</h3>
+                            <div class="post-tags">
+                                <span class="post-tag">Fiction</span>
+                                <span class="post-tag">Horror</span>
+                            </div>
+                            <p class="post-excerpt">Not all ghosts are scary—some just want tea and company. A collection of short, cozy ghost stories to read by candlelight...</p>
+                            <a href="#" class="read-more">Continue Reading →</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
 
-        // Update the UI with the user's profile data
-        if (userInfo) {
-          userInfo.innerText = `Welcome, ${userData?.firstName || "Unknown"} ${userData?.lastName || ""}!`;
-        }
+        <!-- About Section -->
+        <section class="about" id="about">
+            <div class="container">
+                <h2>The Graveyard Keeper</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>Hello, wanderer. I’m the caretaker of this cozy cemetery—where dark thoughts are welcome, and the tea is always brewing.</p>
+                        <p>I’ve always found comfort in the macabre. There’s something beautiful about the quiet of a graveyard, the elegance of decay, and the stories whispered by shadows.</p>
+                        <p>When I’m not writing, I’m probably reading Victorian horror novels, collecting antique skulls, or brewing the perfect cup of Earl Grey for a midnight séance.</p>
+                        <a href="#" class="btn">My Full Story</a>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://source.unsplash.com/random/600x800/?gothic" alt="The Graveyard Keeper">
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        // Update the profile page content
-        if (profileContent) {
-          profileContent.innerHTML = renderProfileCard(user, userData);
-          setupInputValidation();
-        }
+        <!-- Newsletter Section -->
+        <section class="newsletter" id="newsletter">
+            <div class="container">
+                <h2>Join the Midnight Society</h2>
+                <p>Subscribe for eerie tales, dark poetry, and cozy graveyard musings delivered straight to your coffin.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit" class="btn">Subscribe</button>
+                </form>
+            </div>
+        </section>
+    </main>
 
-        // Automatically navigate to the Profile page after sign-in
-        navigate('profile');
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>The Comfy Cemetery</h3>
+                    <p>A resting place for dark thoughts, eerie tales, and midnight comfort.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Explore</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#newsletter">Newsletter</a></li>
+                        <li><a href="#">Archives</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Twitter">t</a>
+                        <a href="#" aria-label="Instagram">i</a>
+                        <a href="#" aria-label="Goodreads">g</a>
+                        <a href="#" aria-label="Email">@</a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 The Comfy Cemetery. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
-        // Update the interests page content
-        initializeInterestsPage();
-      } catch (error) {
-        console.error("Error signing in:", error);
-        alert("Failed to sign in. Please try again.");
-      } finally {
-        const signInButton = document.getElementById('signInButton');
-        if (signInButton) {
-          signInButton.disabled = false;
-          signInButton.innerText = "Sign In with Google";
-        }
-      }
-    }
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const nav = document.getElementById('nav');
 
-    // Sign out
-    async function signOutUser() {
-      try {
-        await signOut(auth);
-        if (userInfo) {
-          userInfo.innerText = "You are signed out.";
-        }
-
-        // Stop the Firestore listener
-        if (unsubscribeUserList) {
-          unsubscribeUserList();
-        }
-
-        // Automatically navigate to the Profile page after sign-out
-        navigate('profile');
-      } catch (error) {
-        console.error("Error signing out:", error);
-      }
-    }
-
-    // Function to update user's profile in Firestore
-    async function updateUserProfile(uid, firstName, lastName, phoneNumber, age) {
-      try {
-        // Capitalize the first letter of first and last names
-        const capitalizedFirstName = capitalizeFirstLetter(firstName);
-        const capitalizedLastName = capitalizeFirstLetter(lastName);
-
-        await setDoc(doc(db, "users", uid), {
-          firstName: capitalizedFirstName,
-          lastName: capitalizedLastName,
-          phoneNumber: phoneNumber || null,
-          age: age || null,
-        }, { merge: true });
-        console.log("Profile updated successfully!");
-      } catch (error) {
-        console.error("Error updating profile:", error);
-      }
-    }
-
-    // Make signInWithGoogle, signOutUser, and updateUserProfile globally accessible
-    window.signInWithGoogle = signInWithGoogle;
-    window.signOutUser = signOutUser;
-    window.updateUserProfile = updateUserProfile;
-
-    // Auto sign-in if already authenticated
-    onAuthStateChanged(auth, async (user) => {
-      console.log("Auth state changed. User:", user);
-
-      if (user) {
-        // Fetch user data from Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        const userData = userDoc.data();
-
-        // Store the current user globally
-        window.currentUser = userData;
-
-        if (userInfo) {
-          userInfo.innerText = `Welcome back, ${userData?.firstName || "Unknown"} ${userData?.lastName || ""}!`;
-        }
-
-        if (profileContent) {
-          profileContent.innerHTML = renderProfileCard(user, userData);
-          setupInputValidation();
-        }
-
-        if (interestsContent) {
-          initializeInterestsPage();
-        }
-      } else {
-        if (userInfo) {
-          userInfo.innerText = "You are not signed in.";
-        }
-        if (profileContent) {
-          profileContent.innerHTML = `
-            <p id="profileInfo">You are not signed in.</p>
-            <button id="signInButton" onclick="signInWithGoogle()">Sign In with Google</button>
-          `;
-        }
-        if (interestsContent) {
-          interestsContent.innerHTML = `
-            <p>Sign in to view your interests.</p>
-          `;
-          // Hide the search bar
-          searchBar.style.display = 'none';
-        }
-      }
-    });
-
-    // Function to set up input validation
-    function setupInputValidation() {
-      const phoneInput = document.getElementById('editPhoneNumber');
-      const ageInput = document.getElementById('editAge');
-
-      if (phoneInput) {
-        phoneInput.addEventListener('input', function () {
-          // Remove non-numeric characters
-          this.value = this.value.replace(/\D/g, '');
-
-          // Validate length
-          if (this.value.length !== 10) {
-            this.classList.add('error');
-            document.getElementById('phoneError').style.display = 'block';
-          } else {
-            this.classList.remove('error');
-            document.getElementById('phoneError').style.display = 'none';
-          }
+        mobileMenuBtn.addEventListener('click', () => {
+            nav.classList.add('active');
         });
-      }
 
-      if (ageInput) {
-        ageInput.addEventListener('input', function () {
-          const age = parseInt(this.value);
-          if (isNaN(age) || age < 18 || age > 100) {
-            this.classList.add('error');
-            document.getElementById('ageError').style.display = 'block';
-          } else {
-            this.classList.remove('error');
-            document.getElementById('ageError').style.display = 'none';
-          }
+        closeMenuBtn.addEventListener('click', () => {
+            nav.classList.remove('active');
         });
-      }
-    }
 
-    // Function to listen for real-time updates to the user list
-    function listenForUserUpdates() {
-      const q = query(collection(db, "users"), limit(10)); // Limit to 10 users for lazy loading
-
-      unsubscribeUserList = onSnapshot(q, (snapshot) => {
-        if (!userList) {
-          console.error("User list element not found.");
-          return;
-        }
-
-        userList.innerHTML = ""; // Clear the current list
-        snapshot.forEach((doc) => {
-          const userData = doc.data();
-          const listItem = document.createElement('li');
-          listItem.textContent = `${userData.firstName} ${userData.lastName}`;
-
-          // Highlight the current user
-          if (userData.uid === auth.currentUser?.uid) {
-            listItem.classList.add('current-user');
-          }
-
-          userList.appendChild(listItem);
+        // Close menu when clicking on a link
+        document.querySelectorAll('nav ul li a').forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('active');
+            });
         });
-      }, (error) => {
-        // Handle Firestore errors gracefully
-        if (error.code === 'permission-denied') {
-          console.log("User does not have permission to access this data.");
-        } else {
-          console.error("Error listening for user updates:", error);
-        }
-      });
-    }
 
-    // Function to initialize the interests page
-    function initializeInterestsPage() {
-      interestsContent.innerHTML = `
-        <p>Here are your interests!</p>
-        <input type="text" id="searchBar" placeholder="Search for a name..." autocomplete="off">
-        <ul id="userList"></ul>
-      `;
-      // Reinitialize the search bar and user list
-      searchBar = document.getElementById('searchBar');
-      userList = document.getElementById('userList');
-      initializeSearchBar();
-      listenForUserUpdates();
-    }
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
 
-    // Reinitialize the search bar on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      if (searchBar && auth.currentUser) {
-        initializeSearchBar();
-      }
-    });
-  </script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
 
-  <!-- Global Navigation Script -->
-  <script>
-    // Utility function to capitalize the first letter of a string
-    function capitalizeFirstLetter(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    }
+        // Newsletter form submission
+        const newsletterForm = document.querySelector('.newsletter-form');
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Welcome to The Comfy Cemetery. Your coffin awaits.');
+            newsletterForm.reset();
+        });
 
-    // Track the current page
-    window.currentPage = 'home';
-
-    // Function to update the active navigation button
-    function updateActiveNavButton(page) {
-      // Remove the 'active' class from all buttons
-      document.querySelectorAll('.navbar button').forEach(button => {
-        button.classList.remove('active');
-      });
-
-      // Add the 'active' class to the current page's button
-      const activeButton = document.getElementById(`nav-${page}`);
-      if (activeButton) {
-        activeButton.classList.add('active');
-      }
-    }
-
-    // Function to switch pages with smooth fade transitions
-    function switchPage(newPage) {
-      const currentPageElement = document.querySelector('.page.active');
-      const newPageElement = document.getElementById(`page-${newPage}`);
-
-      if (currentPageElement && newPageElement) {
-        // Fade out the current page
-        currentPageElement.classList.remove('active');
-        currentPageElement.style.opacity = 0;
-
-        // Wait for the fade-out transition to complete
-        setTimeout(() => {
-          currentPageElement.style.display = 'none';
-
-          // Show and fade in the new page
-          newPageElement.style.display = 'block';
-          setTimeout(() => {
-            newPageElement.classList.add('active');
-            newPageElement.style.opacity = 1;
-          }, 10); // Small delay to ensure display: block is applied
-        }, 300); // Match the transition duration
-      }
-    }
-
-    // Make the navigate function globally accessible
-    function navigate(page) {
-      window.currentPage = page; // Update the current page
-      updateActiveNavButton(page); // Update the active navigation button
-      switchPage(page); // Switch pages with smooth fade transitions
-    }
-
-    // Initialize the home page on load
-    navigate('home');
-
-    // Function to display the live current date
-    function displayCurrentDate() {
-      const dateElement = document.getElementById('currentDate');
-      if (dateElement) {
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.innerText = now.toLocaleDateString('en-US', options);
-      }
-    }
-
-    // Display the current date on page load
-    displayCurrentDate();
-
-    // Function to enable profile editing
-    function enableEdit() {
-      const editProfileDiv = document.getElementById('editProfile');
-      if (editProfileDiv) {
-        editProfileDiv.style.display = 'block';
-        // Focus on the first input field for better accessibility
-        document.getElementById('editFirstName').focus();
-      }
-    }
-
-    // Function to cancel profile editing
-    function cancelEdit() {
-      const editProfileDiv = document.getElementById('editProfile');
-      if (editProfileDiv) {
-        editProfileDiv.style.display = 'none';
-      }
-    }
-
-    // Function to save profile changes
-    async function saveProfile(uid) {
-      const firstName = document.getElementById('editFirstName').value.trim();
-      const lastName = document.getElementById('editLastName').value.trim();
-      const phoneNumber = document.getElementById('editPhoneNumber').value.trim();
-      const age = document.getElementById('editAge').value.trim();
-
-      if (!firstName || !lastName) {
-        alert("Please fill in both first and last name.");
-        return;
-      }
-
-      // Validate phone number
-      const phoneInput = document.getElementById('editPhoneNumber');
-      if (phoneNumber.length !== 10 || !/^\d+$/.test(phoneNumber)) {
-        phoneInput.classList.add('error');
-        document.getElementById('phoneError').style.display = 'block';
-        return;
-      }
-
-      // Validate age
-      const ageInput = document.getElementById('editAge');
-      const ageNumber = parseInt(age);
-      if (isNaN(ageNumber) || ageNumber < 18 || ageNumber > 100) {
-        ageInput.classList.add('error');
-        document.getElementById('ageError').style.display = 'block';
-        return;
-      }
-
-      try {
-        await updateUserProfile(uid, firstName, lastName, phoneNumber, ageNumber);
-
-        // Update the displayed name
-        const profileName = document.getElementById('profileName');
-        if (profileName) {
-          profileName.innerText = `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`;
-        }
-
-        // Update the displayed phone number
-        const phoneNumberElement = document.querySelector('.phone-number');
-        if (phoneNumberElement) {
-          phoneNumberElement.innerText = phoneNumber || "No phone number";
-        }
-
-        // Update the displayed age
-        const ageElement = document.querySelector('.age');
-        if (ageElement) {
-          ageElement.innerText = `Age: ${ageNumber || "Not specified"}`;
-        }
-
-        // Hide the edit form
-        const editProfileDiv = document.getElementById('editProfile');
-        if (editProfileDiv) {
-          editProfileDiv.style.display = 'none';
-        }
-
-        // Update the user info on the home page
-        if (userInfo) {
-          userInfo.innerText = `Welcome, ${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}!`;
-        }
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        alert("Failed to update profile. Please try again.");
-      }
-    }
-  </script>
+        // Parallax effect for video background
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.pageYOffset;
+            const video = document.querySelector('.video-background');
+            if (video) {
+                video.style.transform = 'translateY(' + scrollPosition * 0.5 + 'px)';
+            }
+        });
+    </script>
 </body>
 </html>
